@@ -9,6 +9,7 @@ export const Head = () => {
 
   const navigate = useNavigate();
   const sesion = getSession()
+  console.log(sesion)
 
     useEffect(() => {  
             
@@ -116,7 +117,7 @@ export const Head = () => {
                 <button
                 onClick={handleEdit} 
                 className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow">
-                    {sesion.email}
+                    {sesion.nombre}
                 </button>
               </div>                  
             </li>

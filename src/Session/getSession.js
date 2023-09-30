@@ -21,10 +21,10 @@ export function getSession(){
 
         const payload = JSON.parse(b64utos(parts[1]));
         if (payload.aud === 'authenticated'){
-
             const data = {
                 aud : payload.aud,
-                email: payload.email
+                email: payload.email,
+                nombre: payload.user_metadata.name
             }
             return (data);
         }

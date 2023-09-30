@@ -11,10 +11,10 @@ export const AppRouter = () => {
         <Routes>
             <Route path="/" element= {<Head />}>
                 <Route index element={<Home/>}/>
+                <Route path="Edit" element={<Edit/>}/>
                 
             </Route>
-            <Route path="Login" element={<LoginPage/>}/>
-            <Route path="Edit" element={<Edit/>}/>
+            <Route path="Login" element={<LoginPage/>}/>            
             <Route path="Load" element={<Load/>}/>
         </Routes>
     </>
