@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
     const navigate = useNavigate();
-
+    const sesion = getSession()
+    
     useEffect(() => {  
-        const sesion = getSession()
+        
         if (sesion === false){
             navigate("/Login")
         }

@@ -11,7 +11,7 @@ function LoginPage() {
   const [user, setUser] = useState([])
 
   const navigate = useNavigate();
-  const sesion = getSession
+  const sesion = getSession()
   useEffect(() => {
       if (sesion === false){
           navigate("/Login")
