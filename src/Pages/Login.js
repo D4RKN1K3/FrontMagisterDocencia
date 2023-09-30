@@ -12,6 +12,8 @@ function LoginPage() {
 
   const navigate = useNavigate();
   const sesion = getSession()
+
+  
   useEffect(() => {
       if (sesion === false){
           navigate("/Login")

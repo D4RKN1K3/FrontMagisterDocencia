@@ -29,8 +29,12 @@ export function Formulario({setUser}) {
             "password" : password
         }
       
-        send(PasswordEncrypt(data))        
-        navigate("/");       
+        send(PasswordEncrypt(data))  
+
+        navigate("/Load")     
+         
+        
+              
         
 
     
