@@ -1,14 +1,9 @@
-import logo from './logo.svg';
+import { AppRouter } from "./router/AppRouter"
 import './App.css';
-import { Head } from './components/Head';
+
 
 function App() {
-  return (
-
-    <div className="App">
-      <Head/>
-    </div>
-  );
+  return <AppRouter />
 }
 
 export default App;

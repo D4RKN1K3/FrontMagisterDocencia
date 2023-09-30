@@ -1,7 +1,33 @@
-import React from 'react'
 import foto from '../img/whipala.png'
+import React, { useEffect } from "react";
+import { getSession } from "../Session/getSession";
+import { useNavigate } from "react-router-dom";
+import deleteSession from '../Session/deleteSession';
+
 
 export const Head = () => {
+
+  const navigate = useNavigate();
+  const sesion = getSession()
+
+    useEffect(() => {  
+            
+        if (sesion === false){
+            navigate("/Login")
+        }
+    }, []); 
+
+    const handleLogoutClick = () => {
+      deleteSession()
+      navigate("/Login")
+    };
+    const handleEdit = () => {
+      
+      navigate("/Edit")
+    };
+
+
+
   return (
     
     <header class="bg-5 font-normal">
@@ -83,19 +109,37 @@ export const Head = () => {
             </ul>
           </nav>
         </div>
-  
+        <nav>
+          <ul>
+            <li>
+              <div class="sm:flex sm:gap-4">
+                <button
+                onClick={handleEdit} 
+                className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow">
+                    {sesion.email}
+                </button>
+              </div>                  
+            </li>
+            <li>
+              <div class="sm:flex sm:gap-4">
+                <button
+                onClick={handleLogoutClick} // Asigna la función al evento onClick
+                className="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow">
+                    Cerrar sesion
+                </button>
+              </div>      
+            
+              
+            </li>
+            
+          </ul>
+
+        </nav>
         <div class="flex items-center gap-4">
-          <div class="sm:flex sm:gap-4">
-            <a
-              class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow"
-              href="/"
-            >
-              Login
-            </a>
-          </div>
+          
   
           <div class="block md:hidden">
-            <button
+            <button 
               class="rounded bg-gray-100 p-2 text-gray-600 transition hover:text-gray-600/75"
             >
               <svg
@@ -120,9 +164,12 @@ export const Head = () => {
     <div class="hidden md:block border-t border-gray-200 sr-only">
 
       <img src={foto} alt="whipala" />
-
+      
+    
     </div>
   </header>
+ 
+  
 
   )
 }
