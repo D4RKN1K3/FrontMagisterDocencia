@@ -12,18 +12,26 @@ export const Docs = () => {
     
     
     
-    useEffect(() => {  
-        
-        if (sesion === false){
-            navigate("/Login")
-        } else {
-           
-            const documents = documentRequest();
-            //setDocumentList(documents);
-            console.log("aca", documents)
+    useEffect(() => {
+        const fetchData = async () => {
+          if (sesion === false) {
+            navigate("/Login");
+          } else {
+            try {
+              const documents = await documentRequest();
+              // Ahora puedes trabajar con 'documents' aquí
+              console.log("aca", documents);
+              setDocumentList(documents);
+            } catch (error) {
+            
+              console.error("Error al obtener los documentos:", error);
+            }
           }
-    }, [navigate,sesion]); 
-
+        };
+      
+        fetchData();
+      }, [navigate, sesion]);
+      
 
 
     const handleFileChange = (event) => {
@@ -47,16 +55,23 @@ export const Docs = () => {
       <button onClick={handleUpload}>Subir</button>
 
       <h2>Lista de Documentos:</h2>
-      <ul>
-        {documentList.map((document, index) => (
-          <li key={index}>
-            {/* Renderiza los detalles de cada documento */}
-            <div>Nombre: {document.nombre}</div>
-            <div>Tipo: {document.tipo}</div>
-            {/* Agrega más detalles según la estructura del objeto */}
-          </li>
-        ))}
-      </ul>
+        <ul>
+        {documentList ? (
+            documentList.map((document, index) => (
+            <li key={index}>
+                <div>
+                <span>id: {document.documentID} </span>
+                <a href= {document.archive} target="_blank" rel="noopener noreferrer">
+                {document.format.name}
+                </a>
+                </div>
+            </li>
+            ))
+        ) : (
+            <li>Cargando documentos...</li>
+        )}
+        </ul>
+
     </div>
     )
 }
