@@ -2,7 +2,7 @@ import { Head } from "../components/Head"
 import { Home } from "../Pages/home"
 import { Routes, Route } from "react-router-dom"
 import LoginPage from '../Pages/Login'
-import { Edit } from "../Pages/Edit"
+import { Info } from "../Pages/Info"
 import { Load } from "../Pages/Load"
 import { Docs } from "../Pages/docs"
 import Auth from "../Pages/Auth"
@@ -13,7 +13,7 @@ export const AppRouter = () => {
         <Routes>
             <Route path="/" element= {<Head />}>
                 <Route index element={<Home/>}/>
-                <Route path="Edit" element={<Edit/>}/>
+                <Route path="Info" element={<Info/>}/>
                 <Route path="Docs" element={<Docs/>}/>
                 
             </Route>

@@ -7,7 +7,6 @@ export function documentSend(document){
     const access_token = {access_token: Cookies.get('access_token')}
 
     const aux = PasswordEncrypt(access_token)
-    console.log(document.file)
     // Configurar la solicitud
     let config = {
         method: "POST",
