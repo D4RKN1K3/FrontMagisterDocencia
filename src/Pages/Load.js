@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { getSession } from "../Session/getSession";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/LoginGoogle";
 
 export const Load = () => {
   const navigate = useNavigate();
@@ -25,5 +26,5 @@ export const Load = () => {
     };
   }, [navigate]);
 
-  return <h1>Cargando</h1>;
+  return <main><Loader/></main>
 };

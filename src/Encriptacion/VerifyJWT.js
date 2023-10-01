@@ -23,7 +23,7 @@ export function verifyToken(token){
         
         sessionDecode(payload.session.encryptedData, payload.session.iv)
             
-        return ('El token es válido.');
+        return ('El token es válido.', payload);
 
     } else {
         return (console.log('El token no es válido.'));

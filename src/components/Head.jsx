@@ -1,7 +1,7 @@
 import foto from '../img/whipala.png'
 import React, { useEffect } from "react";
 import { getSession } from "../Session/getSession";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import deleteSession from '../Session/deleteSession';
 
 
@@ -9,14 +9,14 @@ export const Head = () => {
 
   const navigate = useNavigate();
   const sesion = getSession()
-  console.log(sesion)
+
 
     useEffect(() => {  
             
-        if (sesion === false){
+      if (sesion === false){
             navigate("/Login")
         }
-    }, []); 
+    }, [navigate, sesion]); 
 
     const handleLogoutClick = () => {
       deleteSession()
@@ -30,8 +30,9 @@ export const Head = () => {
 
 
   return (
-    
-    <header class="bg-5 font-normal">
+    <>
+     <header className="bg-5 font-normal">
+      
     <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
       <div class="flex h-16 items-center justify-between">
         <div class="md:flex md:items-center md:gap-12">
@@ -102,9 +103,9 @@ export const Head = () => {
               <li>
                 <a
                   class="text-gray-500 transition hover:text-gray-500/75"
-                  href="/"
+                  href="/Docs"
                 >
-                  Blog
+                  Documentos
                 </a>
               </li>
             </ul>
@@ -164,11 +165,16 @@ export const Head = () => {
     </div>
     <div class="hidden md:block border-t border-gray-200 sr-only">
 
-      <img src={foto} alt="whipala" />
-      
+      <img src={foto} alt="whipala" />     
     
     </div>
-  </header>
+    </header>
+    <body>
+    <Outlet></Outlet>
+    </body>
+    </>
+   
+
  
   
 

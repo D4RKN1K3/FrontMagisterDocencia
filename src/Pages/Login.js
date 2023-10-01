@@ -21,7 +21,7 @@ function LoginPage() {
       else{
           navigate("/")
       }
-  }, []); 
+  }, [navigate, sesion]); 
 
 
   return (
