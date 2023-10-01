@@ -24,7 +24,7 @@ export const Head = () => {
     };
     const handleEdit = () => {
       
-      navigate("/Edit")
+      navigate("/Info")
     };
 
 

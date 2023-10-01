@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import PasswordEncrypt from "../Encriptacion/UserEncrypt";
+import PasswordEncrypt from "../../Encriptacion/UserEncrypt";
 
 export function dataRequest(){
 
