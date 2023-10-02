@@ -18,7 +18,7 @@ export const Load = () => {
     };
 
    
-    const intervalId = setInterval(checkSessionAndRedirect, 3000);
+    const intervalId = setInterval(checkSessionAndRedirect, 5000);
 
     
     return () => {
