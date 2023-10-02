@@ -1,4 +1,5 @@
 import foto from '../img/whipala.png'
+import logo from '../img/logo-uta2.png'
 import React, { useEffect } from "react";
 import { getSession } from "../Session/getSession";
 import { Outlet, useNavigate } from "react-router-dom";
@@ -42,6 +43,12 @@ export const Head = () => {
           <div class="hidden md:block">
             <nav aria-label="Global">
               <ul class="flex items-center gap-6 text-sm">
+                <li>
+                  <img 
+                  className="w-18 h-14 mx-auto my-3"
+                  src={logo} alt="Logo Uta" 
+                  />
+                </li>
                 <li>
                   <a
                     class="transition font-bold hover:text-4 hover:text-lg"

@@ -71,7 +71,7 @@ export const Info = () => {
 
       return (
         <div
-        className="mx-auto max-w-lg"
+        className="mx-auto max-w-lg font-normal"
         >
           <h1>Datos del usuario</h1>
           {isEditing ? (

@@ -1,4 +1,5 @@
 import "./Formulario.css"
+import logo from '../img/logo-uta.png'
 import { useState } from "react"
 import { PasswordEncrypt } from "../Encriptacion/UserEncrypt"
 import send from "../envioDatos/loginSend";
@@ -42,6 +43,11 @@ export function Formulario({setUser}) {
                 <h1 className="text-center text-2xl font-bold text-4 sm:text-3xl">
                     Inicio de sesión
                 </h1>
+
+                <img 
+                className="w-40 h-40 mx-auto my-3"
+                src={logo} alt="Logo Uta" 
+                />
 
                 <form
                 onSubmit={handleSubmit}
