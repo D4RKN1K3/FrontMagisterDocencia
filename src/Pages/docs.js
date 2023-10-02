@@ -30,7 +30,7 @@ export const Docs = () => {
         };
       
         fetchData();
-      }, [navigate, sesion]);
+      }, []);
       
 
 

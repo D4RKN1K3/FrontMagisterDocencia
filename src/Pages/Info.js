@@ -70,16 +70,22 @@ export const Info = () => {
       
 
       return (
-        <div>
+        <div
+        className="mx-auto max-w-lg"
+        >
           <h1>Datos del usuario</h1>
           {isEditing ? (
-            <form>
+            <form
+            className="mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"
+            id="borderimg1"
+            >
               <div className="form-group">
   <label>
     Primer Nombre:
     <input
       type="text"
       name="firstName"
+      className="mx-2"
       value={editedData.firstName}
       placeholder={userData?.firstName || ""}
       onChange={handleInputChange}
@@ -92,6 +98,7 @@ export const Info = () => {
     <input
       type="text"
       name="secondName"
+      className="mx-2"
       value={editedData.secondName}
       placeholder={userData?.secondName || ""}
       onChange={handleInputChange}
@@ -104,6 +111,7 @@ export const Info = () => {
     <input
       type="text"
       name="surnameM"
+      className="mx-2"
       value={editedData.surnameM}
       placeholder={userData?.surnameM || ""}
       onChange={handleInputChange}
@@ -116,6 +124,7 @@ export const Info = () => {
     <input
       type="text"
       name="surnameF"
+      className="mx-2"
       value={editedData.surnameF}
       placeholder={userData?.surnameF || ""}
       onChange={handleInputChange}
@@ -128,6 +137,7 @@ export const Info = () => {
     <input
       type="text"
       name="sex"
+      className="mx-2"
       value={editedData.sex}
       placeholder={userData?.sex || ""}
       onChange={handleInputChange}
@@ -140,6 +150,7 @@ export const Info = () => {
     <input
       type="text"
       name="stateCivil"
+      className="mx-2"
       value={editedData.stateCivil}
       placeholder={userData?.stateCivil || ""}
       onChange={handleInputChange}
@@ -152,6 +163,7 @@ export const Info = () => {
     <input
       type="text"
       name="birthday"
+      className="mx-2"
       value={editedData.birthday}
       placeholder={userData?.birthday || ""}
       onChange={handleInputChange}
@@ -164,6 +176,7 @@ export const Info = () => {
     <input
       type="text"
       name="address"
+      className="mx-2"
       value={editedData.address}
       placeholder={userData?.address || ""}
       onChange={handleInputChange}
@@ -176,6 +189,7 @@ export const Info = () => {
     <input
       type="text"
       name="email"
+      className="mx-2"
       value={editedData.email}
       placeholder={userData?.email || ""}
       onChange={handleInputChange}
@@ -188,6 +202,7 @@ export const Info = () => {
     <input
       type="text"
       name="phone"
+      className="mx-2"
       value={editedData.phone}
       placeholder={userData?.phone || ""}
       onChange={handleInputChange}
@@ -201,7 +216,9 @@ export const Info = () => {
           ) : (
             <>
               {userData ? (
-                <ul>
+                <ul
+                className="mx-auto max-w-lg items-center"
+                >
                   <li><strong>RUT:</strong> {userData.rut}</li>
                   <li><strong>Primer Nombre:</strong> {userData.firstName}</li>
                   <li><strong>Segundo Nombre:</strong> {userData.secondName}</li>
