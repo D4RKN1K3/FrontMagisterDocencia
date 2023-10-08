@@ -21,7 +21,7 @@ export function verifyToken(token){
         //const header = JSON.parse(b64utos(parts[0]));
         const payload = JSON.parse(b64utos(parts[1]));
         
-        sessionDecode(payload.session.encryptedData, payload.session.iv)
+        sessionDecode(payload.data.encryptedData, payload.data.iv)
             
         return ('El token es válido.', payload);
 

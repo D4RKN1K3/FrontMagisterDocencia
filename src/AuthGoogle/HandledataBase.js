@@ -42,6 +42,7 @@ class SupaBaseAuthStateSocial extends AuthStateSocial {
 
   checkSessionSocial() {
       supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log(session)
         if (event === 'SIGNED_IN') {
           const access_token = session?.access_token;
           const refresh_token = session?.refresh_Token;
