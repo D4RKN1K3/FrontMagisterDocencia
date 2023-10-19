@@ -29,9 +29,9 @@ export function Formulario({setUser}) {
             "email": usuario,
             "password" : password
         }
-      
+        
         send(PasswordEncrypt(data))  
-
+        
         navigate("/Load")     
          
     }

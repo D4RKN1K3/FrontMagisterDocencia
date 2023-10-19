@@ -5,6 +5,7 @@ import LoginPage from '../Pages/Login'
 import { Info } from "../Pages/Info"
 import { Load } from "../Pages/Load"
 import { Docs } from "../Pages/docs"
+import Edit from "../Pages/Edit"
 import Auth from "../Pages/Auth"
 import AuthAdministrative from "../Pages/AuthAdministrative"
 
@@ -22,6 +23,7 @@ export const AppRouter = () => {
             <Route path="Login" element={<LoginPage/>}/>  
             <Route path="Auth" element={<Auth/>}/>          
             <Route path="Load" element={<Load/>}/>
+            <Route path="Edit" element={<Edit/>}/>
             <Route path="AuthAdministrative" element={<AuthAdministrative/>}/>
             <Route path="Test" element={<Test/>}/>
         </Routes>

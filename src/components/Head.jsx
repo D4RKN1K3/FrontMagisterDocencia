@@ -114,7 +114,7 @@ export const Head = () => {
                 <li>
                   <div class="sm:flex sm:gap-4">
                     <button
-                    onClick={handleLogoutClick} // Asigna la función al evento onClick
+                    onClick={handleLogoutClick} 
                     className="inline-block rounded border border-indigo-600 bg-4 px-12 py-3 text-sm font-medium text-white hover:bg-1  focus:outline-none focus:ring active:text-indigo-500">
                         Cerrar sesion
                     </button>
