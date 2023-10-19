@@ -39,7 +39,7 @@ export function Insert() {
     const validMaritalStatuses = ['Soltero/a', 'Casado/a', 'Divorciado/a', 'Viudo/a', 'Otro'];
     const validGenders = ['Masculino', 'Femenino', 'No binario', 'Otro'];
 
-      //poner punto y guion al rut
+
     const handleRutChange = (e) => {
         let rut = e.target.value;
         rut = rut.replace(/\D/g, '');      
@@ -54,10 +54,9 @@ export function Insert() {
     
     const handleDateChange = (e) => {
         let date = e.target.value;
-        date = date.replace(/\D/g, ''); // Elimina caracteres no numéricos
+        date = date.replace(/\D/g, ''); 
     
         if (date.length > 4) {
-          // Si la fecha tiene más de 4 dígitos, formatea como "DD-MM-YY"
           date = date.replace(/(\d{2})(\d{2})(\d{4})/, '$1-$2-$3');
         }
         

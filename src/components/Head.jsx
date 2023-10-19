@@ -24,7 +24,6 @@ export const Head = () => {
       navigate("/Login")
     };
     const handleEdit = () => {
-      
       navigate("/Info")
     };
 
@@ -61,9 +60,9 @@ export const Head = () => {
                 <li>
                   <a
                     class=" transition font-bold hover:text-4 hover:text-lg"
-                    href="/"
+                    href="/List"
                   >
-                    Seccion 2
+                    Listado de estudiantes
                   </a>
                 </li>
     

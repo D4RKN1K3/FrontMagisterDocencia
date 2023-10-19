@@ -3,6 +3,7 @@ import { Home } from "../Pages/home"
 import { Routes, Route } from "react-router-dom"
 import LoginPage from '../Pages/Login'
 import { Info } from "../Pages/Info"
+import { List } from "../Pages/List"
 import { Load } from "../Pages/Load"
 import { Docs } from "../Pages/docs"
 import Edit from "../Pages/Edit"
@@ -17,6 +18,7 @@ export const AppRouter = () => {
         <Routes>
             <Route path="/" element= {<Head />}>
                 <Route index element={<Home/>}/>
+                <Route path="List" element={<List/>}/>
                 <Route path="Info" element={<Info/>}/>
                 <Route path="Docs" element={<Docs/>}/>
             </Route>
