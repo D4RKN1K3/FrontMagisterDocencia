@@ -30,7 +30,7 @@ export const POSTRequest = async (url, newItem) => {
         iv,
     };
     const token = signData(payload);
-    
+
     const config = {
         method: 'POST',
         headers: {
@@ -43,8 +43,9 @@ export const POSTRequest = async (url, newItem) => {
 };
 
 // Función generica para subir Archivos 
-export const POSTFileRequest = async (url, newItem, formData) => {
-
+export const POSTFileRequest = async (url, newItem, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
     const { encryptedData, iv } = encryptData(newItem);
 
     const payload = {

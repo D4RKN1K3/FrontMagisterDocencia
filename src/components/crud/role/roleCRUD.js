@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
 
 import ModalCRUD from '../../modal/modalCRUD';
 import Alert from '../../alert/alert';
@@ -8,7 +9,7 @@ import WaitingAlert from '../../alert/waitingAlert';
 
 import { GETRequest, POSTRequest, DELETERequest } from '../../../utils/requestHelpers';
 import { sortItems } from '../../../utils/crudHelpers/searchFilter';
-import { renewSession } from '../../../utils/sessionHelpers';
+import { renewSession, deniedSession } from '../../../utils/sessionHelpers';
 import FormHeaderNotUpdate from '../../forms/body/formContainerNotUpdate'
 import MultiSelect from '../../input/multiSelect';
 import CustomButton from '../../button/customButton';
@@ -16,13 +17,14 @@ import CustomButton from '../../button/customButton';
 const CustomPath = () => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
     </svg>
   );
 };
 
 const RoleCRUD = ({ name, urls, userID, handleFetchItems }) => {
   const [itemName] = useState(name);
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [sortDirection] = useState('asc');
@@ -125,12 +127,16 @@ const RoleCRUD = ({ name, urls, userID, handleFetchItems }) => {
       setModalOpen(false);
       await handleFetchItems();
     }
+    else if (data.errorDenied) {
+      setMessageError(data.errorDenied);
+      deniedSession(navigate);
+    }
     else if (data.expirationError) {
       const renewedData = await renewSession();
       OptionMessage(renewedData);
     }
     else if (data.message) {
-      if (data.message.error.message) {
+      if (data.message.error.message !== undefined) {
         setMessageError(data.message.error.message);
         return
       }
@@ -141,11 +147,13 @@ const RoleCRUD = ({ name, urls, userID, handleFetchItems }) => {
       setMessageError(<p>Se encontraron los siguientes errores:<br />{errorList}</p>);
     }
     else if (data.error) {
-      if (data.error.message) {
+      if (Object.keys(data.error).length === 0) {
+        setMessageError('Error desconocido');
+      } else if (data.error.message !== undefined) {
         setMessageError(data.error.message);
-        return
+      } else {
+        setMessageError(data.error);
       }
-      setMessageError(data.error);
     }
     else if (data) {
       const sortedItems = sortItems(data, sortProperty, sortDirection);

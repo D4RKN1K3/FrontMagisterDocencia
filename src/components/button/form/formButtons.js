@@ -38,7 +38,6 @@ const FormButtons = ({ handleSubmit, closeModal, updateId, itemName }) => {
                             />
                         </svg>
                     )}
-
                     {updateId ? `Actualizar ${itemName}` : `Crear ${itemName}`}
                 </CustomButton>
             </div>

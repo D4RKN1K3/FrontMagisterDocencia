@@ -1,6 +1,8 @@
 import './Login.css'
 import React from "react";
 import UserCRUD from '../components/crud/user/userCRUD';
+import SidebarAdministrative from '../components/sidebard/administrative/sidebarAdministrative';
+import Navbar from '../components/navbar/navbar';
 
 function Test() {
 
@@ -14,9 +16,15 @@ function Test() {
 
     return (
         <main>
-            <UserCRUD name={'Usuario'} urls={myUrls} title={`Bienvenido a gestion de usuarios`} subtitle={'CRUD de Usuarios'} />
+            <SidebarAdministrative />
+            <Navbar />
+            <div className="ml-16 sm:ml-10">
+                <div className="container mt-8">
+                    <UserCRUD name={'Usuario'} urls={myUrls} title={`Bienvenido a gestion de usuarios`} subtitle={'CRUD de Usuarios'} />
+                </div>
+            </div>
         </main>
     )
 }
 
-export default Test
+export default Test;

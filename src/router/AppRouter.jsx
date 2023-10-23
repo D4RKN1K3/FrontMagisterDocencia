@@ -1,36 +1,23 @@
-import { Head } from "../components/Head"
-import { Home } from "../Pages/home"
-import { Routes, Route } from "react-router-dom"
-import LoginPage from '../Pages/Login'
-import { Info } from "../Pages/Info"
-import { List } from "../Pages/List"
-import { Load } from "../Pages/Load"
-import { Docs } from "../Pages/docs"
-import Edit from "../Pages/Edit"
-import Auth from "../Pages/Auth"
-import AuthAdministrative from "../Pages/AuthAdministrative"
+import { Routes, Route } from "react-router-dom";
 
 import Test from "../Pages/Test"
+import Test2 from "../Pages/Test2"
+import Test3 from "../Pages/Test3"
+
+import AuthRouter from "./auth/authRouter";
+import AdministrativeRouter from "./administrativeRouter/administrativeRouter";
+import StudentRouter from "./student/studentRouter";
 
 export const AppRouter = () => {
     return <>
-    
+
         <Routes>
-            <Route path="/" element= {<Head />}>
-                <Route index element={<Home/>}/>
-                <Route path="List" element={<List/>}/>
-                <Route path="Info" element={<Info/>}/>
-                <Route path="Docs" element={<Docs/>}/>
-            </Route>
-            <Route path="Login" element={<LoginPage/>}/>  
-            <Route path="Auth" element={<Auth/>}/>          
-            <Route path="Load" element={<Load/>}/>
-            <Route path="Edit" element={<Edit/>}/>
-            <Route path="AuthAdministrative" element={<AuthAdministrative/>}/>
-            <Route path="Test" element={<Test/>}/>
+            <Route path="/*" element={<AuthRouter />} />
+            <Route path="/Administrative/*" element={<AdministrativeRouter />} />
+            <Route path="/Dashboard/*" element={<StudentRouter />} />
+            <Route path="Test" element={<Test />} />
+            <Route path="Test2" element={<Test2 />} />
+            <Route path="Test3" element={<Test3 />} />
         </Routes>
     </>
 };
-    
-    
-   

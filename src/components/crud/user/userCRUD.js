@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
 
 import ModalCRUD from '../../modal/modalCRUD';
 import Alert from '../../alert/alert';
@@ -10,7 +11,7 @@ import CustomButton from '../../button/customButton';
 
 import { GETRequest, POSTRequest, PUTRequest, DELETERequest } from '../../../utils/requestHelpers';
 import { filterItems, sortItems } from '../../../utils/crudHelpers/searchFilter';
-import { renewSession } from '../../../utils/sessionHelpers';
+import { renewSession, deniedSession } from '../../../utils/sessionHelpers';
 import ItemListHeader from '../../forms/header/itemListHeader';
 import SearchWithSelect from '../../search/searchWithSelect';
 import SortButton from '../../sort/sortButton';
@@ -19,11 +20,14 @@ import FormContainer from '../../forms/body/formContainer';
 import TextInput from '../../input/textInput';
 import DynamicSelect from '../../input/dynamicSelect';
 import MultiSelect from '../../input/multiSelect';
-import RoleCRUD from '../role/roleCRUD';
+import RoleCRUD from './role/roleCRUD';
 import PasswordCRUD from './password/passwordCRUD';
+import ExcelExportComponent from '../../export/ExcelExportComponent';
+import ImportCRUD from './import/ImportCRUD';
 
 const UserCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
+  const navigate = useNavigate();
 
   const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -239,30 +243,41 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
     if (data.verificationMessage) {
       setMessageVerification(data.verificationMessage);
       fetchItems();
-
       closeModal();
+    }
+    else if (data.errorDenied) {
+      setMessageError(data.errorDenied);
+      deniedSession(navigate);
     }
     else if (data.expirationError) {
       const renewedData = await renewSession();
       OptionMessage(renewedData);
     }
     else if (data.message) {
-      if (data.message.error.message) {
+      if (data.message.error.message !== undefined) {
         setMessageError(data.message.error.message);
         return
       }
       setMessageError(data.message);
     }
     else if (data.errors) {
-      const errorList = data.errors.map((error, index) => `${index + 1}. ${error.msg}`).join('<br/>');
-      setMessageError(<p>Se encontraron los siguientes errores:<br />{errorList}</p>);
+      const errorList = data.errors.map((error, index) => (`${index + 1}. ${error.msg}`)).join('<br/>');
+      const formattedErrorList = { __html: errorList };
+      setMessageError(
+        <div>
+          <p>Se encontraron los siguientes errores:</p>
+          <div dangerouslySetInnerHTML={formattedErrorList} />
+        </div>
+      );
     }
     else if (data.error) {
-      if (data.error.message) {
+      if (Object.keys(data.error).length === 0) {
+        setMessageError('Error desconocido');
+      } else if (data.error.message !== undefined) {
         setMessageError(data.error.message);
-        return
+      } else {
+        setMessageError(data.error);
       }
-      setMessageError(data.error);
     }
     else if (data) {
       setItems(data);
@@ -322,10 +337,15 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
 
   // -------------------------------Funciones de Extra-------------------------------
 
+  const isMounted = useRef(false);
   useEffect(() => {
-    fetchItems();
+    if (!isMounted.current) {
+      isMounted.current = true;
+      // Coloca el código que deseas ejecutar solo una vez aquí
+      fetchItems();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [navigate]);
 
   const [messageError, setMessageError] = useState(null);
   const [messageVerification, setMessageVerification] = useState(null);
@@ -352,8 +372,8 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
 
   return (
     <div>
-      {messageWaiting && <WaitingAlert />}
-      {messageError && <Alert message={messageError} onClose={closeAlert} />}
+      {messageWaiting && (<WaitingAlert />)}
+      {messageError && (<Alert message={messageError} onClose={closeAlert} />)}
       {messageVerification && (<AlertVerification message={messageVerification} onClose={closeAlert} />)}
 
       <ModalCRUD isOpen={ModalOpen}>
@@ -446,7 +466,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
         </FormContainer>
       </ModalCRUD>
 
-      <div className='min-h-screen mx-2 my-2'>
+      <div className='min-h-screen my-2'>
         <ItemListHeader
           title={title}
           subtitle={subtitle}
@@ -465,7 +485,30 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
           options={options}
         />
 
-        <p className='mt-4 text-gray-500 sm:text-lg'>Mostrando {getNumberFiltered()} de {items.length} elementos después de aplicar los filtros.</p>
+        <p className='my-2 text-gray-500 sm:text-lg'>Mostrando {getNumberFiltered()} de {items.length} elementos después de aplicar los filtros.</p>
+
+        {items.length !== 0 && (
+          <div className='my-2 flex flex-col items-center gap-1 sm:gap-2 sm:flex-row sm:justify-center'>
+            <div className='flex-1 w-full'>
+              <ExcelExportComponent
+                items={items}
+                fileName={`${name}s`}
+                label={`${name}s`}
+                searchTerm={searchTerm}
+                searchType={searchType}
+                sortProperty={sortProperty}
+                sortDirection={sortDirection}
+              />
+            </div>
+            <div className='flex-1 w-full'>
+              <ImportCRUD
+                name={name}
+                label={`${name}s`}
+                handleFetchItems={fetchItems}
+              />
+            </div>
+          </div>
+        )}
 
         <div className='overflow-x-auto'>
           <table className='min-w-full divide-y-2 divide-gray-200 bg-white text-sm mt-4'>
@@ -575,7 +618,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
                       </CustomButton>
                     </div>
                     <div className='w-40'>
-                      <RoleCRUD name={'Roles'} urls={[urls[3]]} userID={item.userID} handleFetchItems={fetchItems} />
+                      <RoleCRUD rolesString={item.roles} rolesIdString={item.rolesid} name={'Roles'} urls={[urls[3]]} userID={item.userID} handleFetchItems={fetchItems} />
                     </div>
                     <div className='w-64'>
                       <PasswordCRUD urls={[urls[2]]} id={item.id} />

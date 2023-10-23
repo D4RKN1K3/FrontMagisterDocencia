@@ -7,7 +7,7 @@ const ModalCRUD = ({ isOpen, children }) => {
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center overflow-x-hidden bg-black/50 outline-none focus:outline-none">
-      <div className="bg-white p-0 rounded-lg shadow-md">
+      <div className="ml-16 bg-white p-0 rounded-lg shadow-md">
         {children}
       </div>
     </div>

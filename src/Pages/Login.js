@@ -13,26 +13,24 @@ function LoginPage() {
   const navigate = useNavigate();
   const sesion = getSession()
 
-  
+
   useEffect(() => {
-      if (sesion === false){
-          navigate("/Login")
-      }
-      else{
-          navigate("/")
-      }
-  }, [navigate, sesion]); 
+    if (sesion === false) {
+      navigate("/Login")
+    }
+    else {
+      navigate("/")
+    }
+  }, [navigate, sesion]);
 
 
   return (
     <div className='Login'>
       {
         !user.length > 0
-        ?<Formulario setUser={setUser} />
-        :<Home />
-        
+          ? <Formulario setUser={setUser} />
+          : <Home />
       }
-     
     </div>
   )
 }

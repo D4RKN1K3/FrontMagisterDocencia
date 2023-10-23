@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
 
 import ModalCRUD from '../../../modal/modalCRUD';
 import Alert from '../../../alert/alert';
@@ -7,7 +8,7 @@ import AlertVerification from '../../../alert/alertVerification';
 import WaitingAlert from '../../../alert/waitingAlert';
 
 import { PUTRequest } from '../../../../utils/requestHelpers';
-import { renewSession } from '../../../../utils/sessionHelpers';
+import { renewSession, deniedSession } from '../../../../utils/sessionHelpers';
 import { isPasswordValid } from '../../../../utils/validationUtils';
 import FormHeaderNotUpdate from '../../../forms/body/formContainerNotUpdate'
 import TextInput from '../../../input/textInput';
@@ -41,6 +42,7 @@ const getPasswordRequirementsText = () => {
 
 const PasswordCRUD = ({ urls, id }) => {
   const [itemName] = useState('Usuario');
+  const navigate = useNavigate();
   const [newItem, setNewItem] = useState({
     password: '',
   });
@@ -63,7 +65,7 @@ const PasswordCRUD = ({ urls, id }) => {
           id,
           ...newItem
         };
-        const response = PUTRequest(url, config);
+        const response = await PUTRequest(url, config);
         OptionMessage(response);
       } else {
         setMessageError('No tienes una sesión');
@@ -78,12 +80,16 @@ const PasswordCRUD = ({ urls, id }) => {
       setMessageVerification(data.verificationMessage);
       closeModal();
     }
+    else if (data.errorDenied) {
+      setMessageError(data.errorDenied);
+      deniedSession(navigate);
+    }
     else if (data.expirationError) {
       const renewedData = await renewSession();
       OptionMessage(renewedData);
     }
     else if (data.message) {
-      if (data.message.error.message) {
+      if (data.message.error.message !== undefined) {
         setMessageError(data.message.error.message);
         return
       }
@@ -94,11 +100,13 @@ const PasswordCRUD = ({ urls, id }) => {
       setMessageError(<p>Se encontraron los siguientes errores:<br />{errorList}</p>);
     }
     else if (data.error) {
-      if (data.error.message) {
+      if (Object.keys(data.error).length === 0) {
+        setMessageError('Error desconocido');
+      } else if (data.error.message !== undefined) {
         setMessageError(data.error.message);
-        return
+      } else {
+        setMessageError(data.error);
       }
-      setMessageError(data.error);
     }
     else {
       setMessageError('Error Inesperado');

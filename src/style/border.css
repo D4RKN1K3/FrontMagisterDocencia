@@ -1,0 +1,15 @@
+#borderimg1 {
+  border: 5px solid transparent;
+  border-image: url('../img/whipala.png') 15 round;
+}
+
+#borderimg2 {
+  border: 2px solid transparent;
+  border-image: url('../img/whipala.png') 7 round;
+  transition: border-image 0.3s;
+}
+
+#borderimg2:hover {
+    border: 2px outset transparent;
+  border-image: url('../img/whipala.png') 15 stretch;
+}
