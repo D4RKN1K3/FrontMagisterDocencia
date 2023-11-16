@@ -9,7 +9,7 @@ const SearchWithSelect = ({
     options,
 }) => {
     return (
-        <div className='flex flex-col items-center gap-2 sm:flex-row'>
+        <div className='flex flex-col items-center gap-0 sm:flex-row'>
             <div className='flex-1 w-full sm:w-auto'>
                 <div className="relative z-1">
                     <label htmlFor={selectId} className="sr-only">

@@ -52,6 +52,7 @@ const RoleCRUD = ({ name, urls, userID, handleFetchItems }) => {
         setMessageError('No tienes una session');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error seaching ${itemName}:` + error.message);
     }
   };
@@ -75,6 +76,7 @@ const RoleCRUD = ({ name, urls, userID, handleFetchItems }) => {
         setMessageError('No tienes una sesión');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error creating ${itemName}:` + error.message);
     }
   };
@@ -98,6 +100,7 @@ const RoleCRUD = ({ name, urls, userID, handleFetchItems }) => {
         setMessageError('No tienes una sesión');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error deleting ${itemName}:` + error.message);
     }
   };

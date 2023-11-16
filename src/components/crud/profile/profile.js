@@ -34,6 +34,7 @@ const ProfileCRUD = ({ name, urls, title, subtitle }) => {
         setMessageError('No tienes una session');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error seaching ${itemName}:` + error.message);
     }
   };

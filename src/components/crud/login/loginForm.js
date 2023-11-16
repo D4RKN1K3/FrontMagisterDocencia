@@ -49,6 +49,7 @@ const LoginForm = () => {
         setMessageError('Ya tienes una sesión activa. Cierra la sesión actual para continuar');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error seaching ${itemName}:` + error.message);
     }
   };
@@ -67,6 +68,7 @@ const LoginForm = () => {
           setMessageError('Ya tienes una sesión activa. Cierra la sesión actual para continuar');
         }
       } catch (error) {
+        setMessageWaiting(false);
         setMessageError(`Error seaching password:` + error.message);
       }
     }

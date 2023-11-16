@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
 
 import ModalCRUD from '../../modal/modalCRUD';
 import Alert from '../../alert/alert';
@@ -8,22 +9,22 @@ import WaitingAlert from '../../alert/waitingAlert';
 import IconOnlyAlert from '../../alert/iconOnlyAlert'
 import CustomButton from '../../button/customButton';
 
-import { GETRequest, PUTRequest, DELETERequest } from '../../../utils/requestHelpers';
+import { GETRequest, POSTRequest, PUTRequest, DELETERequest } from '../../../utils/requestHelpers';
 import { filterItems, sortItems } from '../../../utils/crudHelpers/searchFilter';
-import { renewSession } from '../../../utils/sessionHelpers';
-import ItemListHeaderStudents from '../../forms/header/itemListHeaderStudents';
+import { renewSession, deniedSession } from '../../../utils/sessionHelpers';
+import ItemListHeader from '../../forms/header/itemListHeader';
 import SearchWithSelect from '../../search/searchWithSelect';
 import SortButton from '../../sort/sortButton';
 import PaginationButtons from '../../button/table/paginationButtons';
 import FormContainer from '../../forms/body/formContainer';
+import Checkbox from '../../input/checkbox';
 import TextInput from '../../input/textInput';
 import DynamicSelect from '../../input/dynamicSelect';
-import MultiSelect from '../../input/multiSelect';
-import RoleCRUD from '../role/roleCRUD';
-import PasswordCRUD from './password/passwordCRUD';
+import ExcelExportComponent from '../../export/ExcelExportComponent';
 
-const StudentsCRUD = ({ name, urls, title, subtitle }) => {
+const AcademicCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
+  const navigate = useNavigate();
 
   const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -41,10 +42,10 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
     phone: '',
     entry: '',
     id: '',
-    roles: '',
   });
 
   const options = [
+    { label: `Identificador del ${itemName}`, value: 'userID' },
     { label: `Rut del ${itemName}`, value: 'rut' },
     { label: `Primer Nombre`, value: 'firstName' },
     { label: `Segundo Nombre`, value: 'secondName' },
@@ -57,23 +58,15 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
     { label: `Email del ${itemName}`, value: 'email' },
     { label: `Telefono del ${itemName}`, value: 'phone' },
     { label: `Fecha de Creacion`, value: 'entry' },
-    { label: `Roles de ${itemName}`, value: 'roles' },
   ];
   const validMaritalStatuses = ['Soltero/a', 'Casado/a', 'Divorciado/a', 'Viudo/a', 'Otro'];
   const validGenders = ['Masculino', 'Femenino', 'No binario', 'Otro'];
-  const roles = [
-    { value: 1, label: 'Director' },
-    { value: 2, label: 'Encargado' },
-    { value: 3, label: 'Académico' },
-    { value: 4, label: 'Estudiante' },
-  ];
 
-  const [selectedRoles, setSelectedRoles] = useState([]);
   const [updateId, setUpdateId] = useState(null);
   const [selectAll, setSelectAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const ITEMS_PER_PAGE = process.env.REACT_APP_ITEMS_PER_PAGE;
+  const ITEMS_PER_PAGE = parseInt(process.env.REACT_APP_ITEMS_PER_PAGE, 10);
   const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
 
   // -------------------------------Funciones Para CRUD-------------------------------
@@ -93,10 +86,28 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
         setMessageError('No tienes una session');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error seaching ${itemName}:` + error.message);
     }
   };
 
+  const handleCreate = async () => {
+    try {
+      const url = urls[0];
+      const access_token = Cookies.get('access_token');
+      if (access_token) {
+        setMessageWaiting(true);
+        const config = { ...newItem, roleIDs: [3], access_token: access_token };
+        const response = await POSTRequest(url, config);
+        OptionMessage(response);
+      } else {
+        setMessageError('No tienes una session');
+      }
+    } catch (error) {
+      setMessageWaiting(false);
+      setMessageError(`Error creating ${itemName}:` + error.message);
+    }
+  };
 
   const handleUpdate = async () => {
     if (updateId === null) return;
@@ -118,6 +129,7 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
         setMessageError('No tienes una session');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error updating ${itemName}:` + error.message);
     }
   };
@@ -147,6 +159,7 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
         setMessageError('No tienes una sesión');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error deleting ${itemName}:` + error.message);
     }
   };
@@ -156,7 +169,7 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
     if (updateId !== null) {
       await handleUpdate();
     } else {
-      
+      await handleCreate();
     }
   };
 
@@ -180,7 +193,6 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
 
   const clearItem = () => {
     setUpdateId(null);
-    setSelectedRoles([]);
     setNewItem({
       rut: '',
       firstName: '',
@@ -221,30 +233,41 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
     if (data.verificationMessage) {
       setMessageVerification(data.verificationMessage);
       fetchItems();
-
       closeModal();
+    }
+    else if (data.errorDenied) {
+      setMessageError(data.errorDenied);
+      deniedSession(navigate);
     }
     else if (data.expirationError) {
       const renewedData = await renewSession();
       OptionMessage(renewedData);
     }
     else if (data.message) {
-      if (data.message.error.message) {
+      if (data.message.error.message !== undefined) {
         setMessageError(data.message.error.message);
         return
       }
       setMessageError(data.message);
     }
     else if (data.errors) {
-      const errorList = data.errors.map((error, index) => `${index + 1}. ${error.msg}`).join('<br/>');
-      setMessageError(<p>Se encontraron los siguientes errores:<br />{errorList}</p>);
+      const errorList = data.errors.map((error, index) => (`${index + 1}. ${error.msg}`)).join('<br/>');
+      const formattedErrorList = { __html: errorList };
+      setMessageError(
+        <div>
+          <p>Se encontraron los siguientes errores:</p>
+          <div dangerouslySetInnerHTML={formattedErrorList} />
+        </div>
+      );
     }
     else if (data.error) {
-      if (data.error.message) {
+      if (Object.keys(data.error).length === 0) {
+        setMessageError('Error desconocido');
+      } else if (data.error.message !== undefined) {
         setMessageError(data.error.message);
-        return
+      } else {
+        setMessageError(data.error);
       }
-      setMessageError(data.error);
     }
     else if (data) {
       setItems(data);
@@ -302,12 +325,20 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
     setCurrentPage((prevPage) => prevPage + 1);
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
   // -------------------------------Funciones de Extra-------------------------------
 
+  const isMounted = useRef(false);
   useEffect(() => {
-    fetchItems();
+    if (!isMounted.current) {
+      isMounted.current = true;
+      // Coloca el código que deseas ejecutar solo una vez aquí
+      fetchItems();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [navigate]);
 
   const [messageError, setMessageError] = useState(null);
   const [messageVerification, setMessageVerification] = useState(null);
@@ -317,9 +348,6 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
     setMessageError(null);
     setMessageVerification(null);
   }
-  const getFormattedRoles = (roles) => {
-    return roles.split(' ').map(role => role.trim());
-  };
 
   // -------------------------------Funciones para los Modal-------------------------------
   const [ModalOpen, setModalOpen] = useState(false);
@@ -334,8 +362,8 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
 
   return (
     <div>
-      {messageWaiting && <WaitingAlert />}
-      {messageError && <Alert message={messageError} onClose={closeAlert} />}
+      {messageWaiting && (<WaitingAlert />)}
+      {messageError && (<Alert message={messageError} onClose={closeAlert} />)}
       {messageVerification && (<AlertVerification message={messageVerification} onClose={closeAlert} />)}
 
       <ModalCRUD isOpen={ModalOpen}>
@@ -352,15 +380,6 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
             onChange={(e) => setNewItem({ ...newItem, email: e.target.value })}
             placeholder={`Ingresar Email`}
           />
-          {(!updateId) && (
-            <MultiSelect
-              selectId="roles"
-              placeholder="Seleccione Roles"
-              options={roles}
-              selectedRoles={selectedRoles}
-              setSelectedRoles={setSelectedRoles}
-            />
-          )}
           <TextInput
             inputId='rut'
             value={newItem.rut}
@@ -428,8 +447,8 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
         </FormContainer>
       </ModalCRUD>
 
-      <div className='min-h-screen mx-2 my-2'>
-        <ItemListHeaderStudents
+      <div className='min-h-screen my-2'>
+        <ItemListHeader
           title={title}
           subtitle={subtitle}
           itemName={itemName}
@@ -447,20 +466,34 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
           options={options}
         />
 
-        <p className='mt-4 text-gray-500 sm:text-lg'>Mostrando {getNumberFiltered()} de {items.length} elementos después de aplicar los filtros.</p>
+        <p className='my-2 text-gray-500 sm:text-lg'>Mostrando {getNumberFiltered()} de {items.length} elementos después de aplicar los filtros.</p>
+
+        {items.length !== 0 && (
+          <div className='my-2 flex flex-col items-center gap-1 sm:gap-2 sm:flex-row sm:justify-center'>
+            <div className='flex-1 w-full'>
+              <ExcelExportComponent
+                items={items}
+                fileName={`${name}s`}
+                label={`${name}s`}
+                searchTerm={searchTerm}
+                searchType={searchType}
+                sortProperty={sortProperty}
+                sortDirection={sortDirection}
+              />
+            </div>
+          </div>
+        )}
 
         <div className='overflow-x-auto'>
           <table className='min-w-full divide-y-2 divide-gray-200 bg-white text-sm mt-4'>
             <thead className='ltr:text-left rtl:text-right'>
               <tr>
                 <th className='px-4 py-2'>
-                  <input
+                  <Checkbox
                     id='deleteAllInput'
                     name='deleteAllInput'
-                    type='checkbox'
-                    className='h-5 w-5 rounded border-gray-300'
-                    onChange={handleSelectAllChange}
                     checked={selectAll}
+                    onChange={handleSelectAllChange}
                   />
                 </th>
                 {options.map((option) => (
@@ -500,7 +533,7 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
                       onChange={(e) => handleCheckboxChange(e, item)}
                     />
                   </td>
-                  
+                  <td className='px-4 py-2'>{item.userID}</td>
                   <td className='px-4 py-2'>{item.rut}</td>
                   <td className='px-4 py-2'>{item.firstName}</td>
                   <td className='px-4 py-2'>{item.secondName}</td>
@@ -513,27 +546,6 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
                   <td className='px-4 py-2'>{item.email}</td>
                   <td className='px-4 py-2'>{item.phone}</td>
                   <td className='px-4 py-2'>{item.entry}</td>
-                  <td className="whitespace-nowrap px-4 py-2 font-medium">
-                    {getFormattedRoles(item.roles).map((role, index) => (
-                      <span
-                        key={index}
-                        className={`mr-1 px-2.5 py-0.5 rounded 
-                          ${role === 'Director'
-                            ? 'bg-blue-200 text-blue-800'
-                            : role === 'Encargado'
-                              ? 'bg-green-200 text-green-800'
-                              : role === 'Academico'
-                                ? 'bg-yellow-200 text-yellow-800'
-                                : role === 'Estudiante'
-                                  ? 'bg-sky-200 text-sky-800'
-                                  : 'bg-gray-100 text-gray-800'
-                          }`
-                        }
-                      >
-                        {role}
-                      </span>
-                    ))}
-                  </td>
                   <td className='px-4 py-2 flex gap-2'>
                     <div className='w-40'>
                       <CustomButton
@@ -556,12 +568,6 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
                         Actualizar
                       </CustomButton>
                     </div>
-                    <div className='w-40'>
-                      <RoleCRUD name={'Roles'} urls={[urls[3]]} userID={item.userID} handleFetchItems={fetchItems} />
-                    </div>
-                    <div className='w-64'>
-                      <PasswordCRUD urls={[urls[2]]} id={item.id} />
-                    </div>
                   </td>
                 </tr>
               ))}
@@ -569,11 +575,10 @@ const StudentsCRUD = ({ name, urls, title, subtitle }) => {
           </table>
         </div>
 
-        <PaginationButtons currentPage={currentPage} totalPages={totalPages} handlePrevPage={handlePrevPage} handleNextPage={handleNextPage}
-        />
+        <PaginationButtons currentPage={currentPage} totalPages={totalPages} handlePrevPage={handlePrevPage} handleNextPage={handleNextPage} handlePageChange={handlePageChange}/>
       </div>
     </div>
   );
 };
 
-export default StudentsCRUD;
+export default AcademicCRUD;

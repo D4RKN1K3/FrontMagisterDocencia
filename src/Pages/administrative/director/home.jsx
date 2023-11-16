@@ -4,7 +4,7 @@ export const Home = () => {
 
     const sectionsData = [
         {
-            title: 'Gestion de Usuarios',
+            title: 'Gestión de Usuarios',
             description: ' En esta sección, tendrás la capacidad de crear, actualizar y eliminar información de los usuarios. Además, podrás realizar tareas como importar y exportar datos de usuarios, modificar sus roles, y cambiar las contraseñas de los usuarios de manera eficiente y sencilla.',
             link: '/Administrative/Director/Users',
             icon: (
@@ -21,9 +21,9 @@ export const Home = () => {
             ),
         },
         {
-            title: 'Digital Campaigns',
-            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex ut quo possimus adipisci distinctio alias voluptatum blanditiis laudantium.',
-            link: '/services/digital-campaigns',
+            title: 'Gestión de Académicos',
+            description: ' En esta sección, tendrás la capacidad de crear, actualizar y eliminar información de los académicos. Además, podrás realizar tareas como importar y exportar datos de usuarios de manera eficiente y sencilla.',
+            link: '/Administrative/Director/Academic',
             icon: (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -38,9 +38,9 @@ export const Home = () => {
             ),
         },
         {
-            title: 'Digital Campaigns',
-            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex ut quo possimus adipisci distinctio alias voluptatum blanditiis laudantium.',
-            link: '/services/digital-campaigns',
+            title: 'Gestión de Estudiantes',
+            description: ' En esta sección, tendrás la capacidad de crear, actualizar y eliminar información de los estudiantes de manera eficiente y sencilla.',
+            link: '/Administrative/Director/Student',
             icon: (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -55,9 +55,9 @@ export const Home = () => {
             ),
         },
         {
-            title: 'Digital Campaigns',
-            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex ut quo possimus adipisci distinctio alias voluptatum blanditiis laudantium.',
-            link: '/services/digital-campaigns',
+            title: 'Gestión de Títulos',
+            description: 'En esta sección, tendrás la capacidad de crear, actualizar y eliminar información de los títulos de manera eficiente y sencilla.',
+            link: '/Administrative/Director/Title',
             icon: (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

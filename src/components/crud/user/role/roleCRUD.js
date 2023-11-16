@@ -67,6 +67,7 @@ const RoleCRUD = ({ rolesString, rolesIdString, name, urls, userID, handleFetchI
         setMessageError('No tienes una sesión');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error creating ${itemName}:` + error.message);
     }
   };
@@ -90,6 +91,7 @@ const RoleCRUD = ({ rolesString, rolesIdString, name, urls, userID, handleFetchI
         setMessageError('No tienes una sesión');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error deleting ${itemName}:` + error.message);
     }
   };

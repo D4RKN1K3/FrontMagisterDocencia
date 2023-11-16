@@ -17,6 +17,7 @@ import SearchWithSelect from '../../search/searchWithSelect';
 import SortButton from '../../sort/sortButton';
 import PaginationButtons from '../../button/table/paginationButtons';
 import FormContainer from '../../forms/body/formContainer';
+import Checkbox from '../../input/checkbox';
 import TextInput from '../../input/textInput';
 import DynamicSelect from '../../input/dynamicSelect';
 import MultiSelect from '../../input/multiSelect';
@@ -74,7 +75,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
   const [selectAll, setSelectAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const ITEMS_PER_PAGE = process.env.REACT_APP_ITEMS_PER_PAGE;
+  const ITEMS_PER_PAGE = parseInt(process.env.REACT_APP_ITEMS_PER_PAGE, 10);
   const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
 
   // -------------------------------Funciones Para CRUD-------------------------------
@@ -94,6 +95,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
         setMessageError('No tienes una session');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error seaching ${itemName}:` + error.message);
     }
   };
@@ -112,6 +114,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
         setMessageError('No tienes una session');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error creating ${itemName}:` + error.message);
     }
   };
@@ -135,13 +138,14 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
         setMessageError('No tienes una session');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error updating ${itemName}:` + error.message);
     }
   };
 
   const handleDeleteSelected = async () => {
     try {
-      const url = 'urls[0]';
+      const url = urls[0];
       const access_token = Cookies.get('access_token');
       if (access_token) {
         setMessageWaiting(true);
@@ -164,6 +168,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
         setMessageError('No tienes una sesión');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error deleting ${itemName}:` + error.message);
     }
   };
@@ -331,6 +336,10 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
     setCurrentPage((prevPage) => prevPage + 1);
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   // -------------------------------Funciones de Extra-------------------------------
 
   const isMounted = useRef(false);
@@ -488,13 +497,11 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
             <thead className='ltr:text-left rtl:text-right'>
               <tr>
                 <th className='px-4 py-2'>
-                  <input
+                  <Checkbox
                     id='deleteAllInput'
                     name='deleteAllInput'
-                    type='checkbox'
-                    className='h-5 w-5 rounded border-gray-300'
-                    onChange={handleSelectAllChange}
                     checked={selectAll}
+                    onChange={handleSelectAllChange}
                   />
                 </th>
                 {options.map((option) => (
@@ -525,11 +532,9 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
               {getCurrentPageItems().map((item) => (
                 <tr key={item.userID} className='text-center'>
                   <td className='px-4 py-2'>
-                    <input
+                    <Checkbox
                       id={`deleteInput-${item.userID}`}
                       name={`deleteInput-${item.userID}`}
-                      type='checkbox'
-                      className='h-5 w-5 rounded border-gray-300'
                       checked={selectedItems.some((selectedItem) => selectedItem.userID === item.userID)}
                       onChange={(e) => handleCheckboxChange(e, item)}
                     />
@@ -590,8 +595,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
           </table>
         </div>
 
-        <PaginationButtons currentPage={currentPage} totalPages={totalPages} handlePrevPage={handlePrevPage} handleNextPage={handleNextPage}
-        />
+        <PaginationButtons currentPage={currentPage} totalPages={totalPages} handlePrevPage={handlePrevPage} handleNextPage={handleNextPage} handlePageChange={handlePageChange}/>
       </div>
     </div>
   );

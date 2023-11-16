@@ -40,6 +40,7 @@ const ChangePasswordForm = () => {
                 setMessageError('No tienes una sesión activa');
             }
         } catch (error) {
+            setMessageWaiting(false);
             setMessageError(`Error seaching password:` + error.message);
         }
     }

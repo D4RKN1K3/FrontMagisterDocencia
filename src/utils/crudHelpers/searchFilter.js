@@ -5,25 +5,27 @@ export const filterItems = (items, searchTerm, searchType) => {
     }
 
     return items.filter((item) => {
-        const propValue = item[searchType];
+        const nestedProperties = searchType.split('.');
+        let propValue = item;
 
-        if (propValue !== undefined && typeof propValue === 'number') {
-            return propValue.toString().includes(searchTerm);
+        for (const prop of nestedProperties) {
+            propValue = propValue[prop];
+
+            if (propValue === undefined) {
+                // Si alguna propiedad anidada es indefinida, la búsqueda falla
+                return false;
+            }
         }
 
         if (typeof propValue === 'string') {
             return propValue.toLowerCase().includes(searchTerm.toLowerCase());
-        }
-
-        if (propValue instanceof Date) {
+        } else if (typeof propValue === 'number') {
+            return propValue.toString().includes(searchTerm);
+        } else if (propValue instanceof Date) {
             const searchTermDate = new Date(searchTerm);
-
-            // Verificar si la fecha ingresada es válida
             if (isNaN(searchTermDate.getTime())) {
                 return false;
             }
-
-            // Comparar las fechas ignorando las horas, minutos, segundos y milisegundos
             return propValue.getTime() === searchTermDate.getTime();
         }
 
@@ -31,26 +33,31 @@ export const filterItems = (items, searchTerm, searchType) => {
     });
 };
 
+
 // Función para ordenar los elementos según la dirección de ordenamiento y la propiedad seleccionada
 export const sortItems = (items, sortProperty, sortDirection) => {
     return items.sort((a, b) => {
-        const propA = a[sortProperty];
-        const propB = b[sortProperty];
-
-        if (propA !== undefined && propB !== undefined) {
+        if (sortProperty === 'format.name') {
+            const propA = a.format && a.format.name;
+            const propB = b.format && b.format.name;
             if (typeof propA === 'string' && typeof propB === 'string') {
                 return sortDirection === 'asc' ? propA.localeCompare(propB) : propB.localeCompare(propA);
             }
-
-            if (typeof propA === 'number' && typeof propB === 'number') {
-                return sortDirection === 'asc' ? propA - propB : propB - propA;
-            }
-
-            if (propA instanceof Date && propB instanceof Date) {
-                return sortDirection === 'asc' ? propA.getTime() - propB.getTime() : propB.getTime() - propA.getTime();
+        } else {
+            const propA = a[sortProperty];
+            const propB = b[sortProperty];
+            if (propA !== undefined && propB !== undefined) {
+                if (typeof propA === 'string' && typeof propB === 'string') {
+                    return sortDirection === 'asc' ? propA.localeCompare(propB) : propB.localeCompare(propA);
+                }
+                if (typeof propA === 'number' && typeof propB === 'number') {
+                    return sortDirection === 'asc' ? propA - propB : propB - propA;
+                }
+                if (propA instanceof Date && propB instanceof Date) {
+                    return sortDirection === 'asc' ? propA.getTime() - propB.getTime() : propB.getTime() - propA.getTime();
+                }
             }
         }
-
         return 0;
     });
 };

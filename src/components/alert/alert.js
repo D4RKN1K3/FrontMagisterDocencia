@@ -20,27 +20,24 @@ const Alert = ({ message, onClose }) => {
     >
       <div
         role="alert"
-        className="w-80 fixed top-0 right-0 m-4 rounded text-red-700 bg-red-100 
-        p-4 transition-transform duration-300 hover:scale-105 focus:outline-none focus:ring"
+        className="fixed top-0 right-0 m-4 transition-transform duration-300 hover:scale-105 focus:outline-none focus:ring"
       >
-        <div className="flex items-start gap-2 font-bold">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="h-5 w-5"
-          >
-            <path
-              fillRule="evenodd"
-              d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <strong className="block font-medium text-xs sm:text-sm">
-            Mensaje de Error
-          </strong>
+        <div className="flex w-full max-w-sm sm:max-w-md md:max-w-lg overflow-hidden bg-white rounded-lg shadow-md">
+          <div className="flex flex-2 items-center justify-center w-16 bg-red-500">
+            <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 3.36667C10.8167 3.36667 3.3667 10.8167 3.3667 20C3.3667 29.1833 10.8167 36.6333 20 36.6333C29.1834 36.6333 36.6334 29.1833 36.6334 20C36.6334 10.8167 29.1834 3.36667 20 3.36667ZM19.1334 33.3333V22.9H13.3334L21.6667 6.66667V17.1H27.25L19.1334 33.3333Z" />
+            </svg>
+          </div>
+
+          <div className="flex-1 px-4 py-2 -mx-3">
+            <div className="mx-3">
+              <span className="font-semibold text-red-500">Mensaje de Error</span>
+              <div className="text-sm text-gray-600">
+                {message}
+              </div>
+            </div>
+          </div>
         </div>
-        <p className="mt-1 text-xs sm:text-sm text-start">{message}</p>
       </div>
     </div>
   );

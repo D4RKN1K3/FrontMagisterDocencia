@@ -5,12 +5,16 @@ const PaginationButtons = ({
   totalPages,
   handlePrevPage,
   handleNextPage,
+  handlePageChange,
 }) => {
+  
+  const pagesArray = Array.from({ length: totalPages }, (_, i) => i + 1);
+  
   return (
-    <div className="flex item-center justify-center gap-1 mt-2">
+    <div className="flex justify-center items-center space-y-2 text-xs sm:space-y-0 sm:space-x-3 sm:flex mt-2">
       <button
         onClick={handlePrevPage}
-        className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+        className="inline-flex items-center justify-center w-8 h-8 py-0 border rounded-md shadow rtl:rotate-180"
         disabled={currentPage === 1}
       >
         <span className="sr-only">Página anterior</span>
@@ -28,16 +32,24 @@ const PaginationButtons = ({
         </svg>
       </button>
 
-      <div>
-        <span className="block h-8 w-8 rounded border border-gray-100 bg-white text-center leading-8 text-gray-900">
-          {currentPage}
-        </span>
+      <div className="space-x-1">
+        {pagesArray.map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)} // Llama a la nueva función
+            className={`inline-flex items-center justify-center w-8 h-8 py-0 border rounded-md shadow ${currentPage === page ? 'bg-orange-500 text-white' : 'hover:bg-white hover:border-orange-500 hover:text-orange-500'
+              }`}
+          >
+            <span className="sr-only">{`Ir a la página ${page}`}</span>
+            {page}
+          </button>
+        ))}
       </div>
 
       <button
         onClick={handleNextPage}
         disabled={currentPage === totalPages}
-        className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+        className="inline-flex items-center justify-center w-8 h-8 py-0 border rounded-md shadow rtl:rotate-180"
       >
         <span className="sr-only">Página siguiente</span>
         <svg

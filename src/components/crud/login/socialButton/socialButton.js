@@ -29,6 +29,7 @@ const SocialButton = ({ isAdminAccess }) => {
             const response = await GETRequest(url, config);
             OptionMessage(response);
         } catch (error) {
+            setMessageWaiting(false);
             setMessageError(`Error seaching Usuario:` + error.message);
         }
     };

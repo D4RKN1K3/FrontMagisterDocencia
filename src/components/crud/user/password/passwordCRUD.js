@@ -71,6 +71,7 @@ const PasswordCRUD = ({ urls, id }) => {
         setMessageError('No tienes una sesión');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error creating ${itemName}:` + error.message);
     }
   };

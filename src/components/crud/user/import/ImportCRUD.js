@@ -21,7 +21,7 @@ const CustomPath = () => {
   );
 };
 
-const ImportCRUD = ({ name, label, handleFetchItems }) => {
+const ImportCRUD = ({ name, label, url, handleFetchItems }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
@@ -35,7 +35,6 @@ const ImportCRUD = ({ name, label, handleFetchItems }) => {
   const handleCreate = async (event) => {
     event.preventDefault();
     try {
-      const url = process.env.REACT_APP_MIDDLEWARE_URL_BASE + '/role/director/roleAssignment/importUsers/';
       const access_token = Cookies.get('access_token');
       if (access_token) {
         if (selectedFile) {
@@ -53,6 +52,7 @@ const ImportCRUD = ({ name, label, handleFetchItems }) => {
         setMessageError('No tienes una sesión');
       }
     } catch (error) {
+      setMessageWaiting(false);
       setMessageError(`Error importing ${itemName}:` + error.message);
     }
   };
