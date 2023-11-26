@@ -21,9 +21,9 @@ export const Home = () => {
             ),
         },
         {
-            title: 'Digital Campaigns',
-            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex ut quo possimus adipisci distinctio alias voluptatum blanditiis laudantium.',
-            link: '/services/digital-campaigns',
+            title: 'Gestion de Académicos',
+            description: ' En esta sección, tendrás la capacidad de crear, actualizar y eliminar información de los académicos. Además, podrás realizar tareas como importar y exportar datos de usuarios de manera eficiente y sencilla.',
+            link: '/Administrative/Mandated/Academic',
             icon: (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -38,9 +38,9 @@ export const Home = () => {
             ),
         },
         {
-            title: 'Digital Campaigns',
-            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex ut quo possimus adipisci distinctio alias voluptatum blanditiis laudantium.',
-            link: '/services/digital-campaigns',
+            title: 'Gestion de Estudiantes',
+            description: ' En esta sección, tendrás la capacidad de crear, actualizar y eliminar información de los estudiantes. Además, podrás realizar tareas como importar y exportar datos de usuarios de manera eficiente y sencilla.',
+            link: '/Administrative/Mandated/Student',
             icon: (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
