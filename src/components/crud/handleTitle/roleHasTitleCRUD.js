@@ -29,7 +29,7 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
   const { userID } = useParams();
-  
+
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState({
     titleID: '',
@@ -48,7 +48,6 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = parseInt(process.env.REACT_APP_ITEMS_PER_PAGE, 10);
-  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
 
   // -------------------------------Funciones Para CRUD-------------------------------
   const fetchItems = async () => {
@@ -351,33 +350,6 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
     return filteredItems.length;
   }
 
-  const handleSortPropertyChange = (property) => {
-    // Si usuario selecciona una nueva propiedad de ordenamiento, pero es diferente a la propiedad actual,
-    // establecer la dirección de ordenamiento en 'asc' (ascendente)
-    if (property !== sortProperty) {
-      setSortDirection('asc');
-    }
-    // Si usuario selecciona una nueva propiedad de ordenamiento y es la misma que la propiedad actual,
-    // alternar la dirección de ordenamiento entre 'asc' y 'desc'
-    else {
-      setSortDirection((prevDirection) => (prevDirection === 'asc' ? 'desc' : 'asc'));
-    }
-    // Establecer la nueva propiedad de ordenamiento seleccionada
-    setSortProperty(property);
-  };
-
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
   // -------------------------------Funciones de Extra-------------------------------
 
   const isMounted = useRef(false);
@@ -463,7 +435,10 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
             {options.map((option) => (
               <li key={option.value} className="inline-flex start-center md:justify-center items-center my-1 md:my-2 gap-2">
                 <SortButton
-                  onClick={() => handleSortPropertyChange(option.value)}
+                  value={option.value}
+                  sortProperty={sortProperty}
+                  setSortProperty={setSortProperty}
+                  setSortDirection={setSortDirection}
                   isActive={sortProperty === option.value}
                   isAscending={sortDirection === 'asc'}
                 />
@@ -475,19 +450,9 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
           </ul>
         </FilterPanel>
 
-        <p className='mt-2 text-gray-500 sm:text-lg'>Mostrando {getNumberFiltered()} de {items.length} elementos después de aplicar los filtros.</p>
+        <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
 
-        <div className="flex flex-row items-center justify-center gap-2 my-2">
-          <Checkbox
-            id='deleteAllInput'
-            name='deleteAllInput'
-            checked={selectAll}
-            onChange={handleSelectAllChange}
-          />
-          <p className='text-gray-500 sm:text-lg'>Selecionar Todos los {itemName}s</p>
-        </div>
-
-        <ItemsList>
+        <ItemsList itemName={itemName} selectAll={selectAll} handleSelectAllChange={handleSelectAllChange}>
           <>
             {items.length === 0 && messageWaiting && (
               <div colSpan={options.length} className="w-full h-96 translate-x-1/2 translate-y-1/2">
@@ -555,7 +520,6 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
           </>
         </ItemsList>
 
-        <PaginationButtons currentPage={currentPage} totalPages={totalPages} handlePrevPage={handlePrevPage} handleNextPage={handleNextPage} handlePageChange={handlePageChange}/>
       </div>
     </div >
   );

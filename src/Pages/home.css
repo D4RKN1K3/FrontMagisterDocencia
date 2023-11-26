@@ -1,6 +1,0 @@
-#borderimg1 { 
-    border: 5px solid transparent;
-    padding: 15px;
-    border-image: url('../img/whipala.png') 30 round;
-  }
-  

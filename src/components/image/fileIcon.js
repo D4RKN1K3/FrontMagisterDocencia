@@ -22,7 +22,7 @@ const FileIcon = ({ format }) => {
     iconSrc = iconDoc;
     altText = "Word Icon";
   } else if (
-    format === 'xls' ||
+    format === 'xlsx' ||
     format === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   ) {
     iconSrc = iconXls;

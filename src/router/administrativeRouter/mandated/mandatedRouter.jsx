@@ -7,6 +7,8 @@ import { Student } from '../../../Pages/administrative/mandated/student/student'
 import { Document } from '../../../Pages/administrative/mandated/student/document/document';
 import { HandleTitle } from '../../../Pages/administrative/mandated/student/handleTitle/handleTitle';
 import { Title } from '../../../Pages/administrative/mandated/title/title';
+import { Semester } from '../../../Pages/administrative/mandated/semester/semester';
+import { SpecializationHasSemester } from '../../../Pages/administrative/mandated/specialization/specializationHasSemester';
 
 const MandatedRouter = () => {
   return (
@@ -19,6 +21,8 @@ const MandatedRouter = () => {
         <Route path="Document/:roleHasUserID" element={<Document />} />
         <Route path="HandleTitle/:userID" element={<HandleTitle />} />
         <Route path="Title" element={<Title />} />
+        <Route path="Semester" element={<Semester />} />
+        <Route path="SpecializationHasSemester" element={<SpecializationHasSemester/>} />
       </Route>
     </Routes>
   );

@@ -104,7 +104,7 @@ function SidebarAdministrative() {
       <header>
         <Sidebar navigationUser={navigationUser} navigation={navigation} />
       </header>
-      <div className="container ml-8">
+      <div className="my-4 sm:my-6 ml-20 sm:ml-24 mr-4 sm:mr-6">
         <Outlet></Outlet>
       </div>
     </>

@@ -19,59 +19,36 @@ import PaginationButtons from '../../button/table/paginationButtons';
 import FormContainer from '../../forms/body/formContainer';
 import Checkbox from '../../input/checkbox';
 import TextInput from '../../input/textInput';
-import DynamicSelect from '../../input/dynamicSelect';
-import MultiSelect from '../../input/multiSelect';
+import SearchSelect from '../../input/searchSelect';
+import DateInput from '../../input/dateInput';
 import Table from '../../table/table';
 
-const UserCRUD = ({ name, urls, title, subtitle }) => {
+const SemesterCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
 
   const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [newItem, setNewItem] = useState({
-    rut: '',
-    firstName: '',
-    secondName: '',
-    surnameM: '',
-    surnameF: '',
-    sex: '',
-    stateCivil: '',
-    birthday: '',
-    address: '',
-    email: '',
-    phone: '',
-    entry: '',
-    id: '',
-    roles: '',
+    startDate: null,
+    finishDate: null,
+    year: '',
+    semesterNumber: '',
   });
 
   const options = [
-    { label: `Identificador del ${itemName}`, value: 'userID' },
-    { label: `Rut del ${itemName}`, value: 'rut' },
-    { label: `Primer Nombre`, value: 'firstName' },
-    { label: `Segundo Nombre`, value: 'secondName' },
-    { label: `Primer Apellido`, value: 'surnameM' },
-    { label: `Segundo Apellido`, value: 'surnameF' },
-    { label: `Sexo`, value: 'sex' },
-    { label: `Estado Civil`, value: 'stateCivil' },
-    { label: `Fecha de Cumpleaños`, value: 'birthday' },
-    { label: `Direccion`, value: 'address' },
-    { label: `Email del ${itemName}`, value: 'email' },
-    { label: `Telefono del ${itemName}`, value: 'phone' },
-    { label: `Fecha de Creacion`, value: 'entry' },
-    { label: `Roles de ${itemName}`, value: 'roles' },
-  ];
-  const validMaritalStatuses = ['Soltero/a', 'Casado/a', 'Divorciado/a', 'Viudo/a', 'Otro'];
-  const validGenders = ['Masculino', 'Femenino', 'No binario', 'Otro'];
-  const roles = [
-    { value: 1, label: 'Director' },
-    { value: 2, label: 'Encargado' },
-    { value: 3, label: 'Académico' },
-    { value: 4, label: 'Estudiante' },
+    { label: `Identificador del ${itemName}`, value: 'semesterID' },
+    { label: `Año del Semestre`, value: 'year' },
+    { label: `Numero del Semestre`, value: 'semesterNumber' },
+    { label: `Fecha de Inicio`, value: 'startDate' },
+    { label: `Fecha de Finalización`, value: 'finishDate' },
   ];
 
-  const [selectedRoles, setSelectedRoles] = useState([]);
+  const semester = [
+    { value: 1, label: 'Primer Semestre' },
+    { value: 2, label: 'Segundo Semestre' },
+  ];
+
   const [updateId, setUpdateId] = useState(null);
   const [selectAll, setSelectAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -81,14 +58,13 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
   // -------------------------------Funciones Para CRUD-------------------------------
   const fetchItems = async () => {
     try {
-      const url = urls[1];
+      const url = urls[0];
       const access_token = Cookies.get('access_token');
       if (access_token) {
         setMessageWaiting(true);
         const config = {
           access_token,
         };
-
         const response = await GETRequest(url, config);
         OptionMessage(response);
       } else {
@@ -104,10 +80,10 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
     try {
       const url = urls[0];
       const access_token = Cookies.get('access_token');
+      console.log(newItem)
       if (access_token) {
         setMessageWaiting(true);
-        const roleIDs = selectedRoles.map(option => option.value);
-        const config = { ...newItem, roleIDs, access_token: access_token };
+        const config = { ...newItem, access_token };
         const response = await POSTRequest(url, config);
         OptionMessage(response);
       } else {
@@ -128,9 +104,9 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
       if (access_token) {
         setMessageWaiting(true);
         const config = {
-          userID: updateId,
+          semesterID: updateId,
           ...newItem,
-          access_token: access_token,
+          access_token,
         };
         const response = await PUTRequest(url, config);
         OptionMessage(response);
@@ -150,7 +126,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
       if (access_token) {
         setMessageWaiting(true);
         if (selectedItems.length !== 0) {
-          const idsToDelete = selectedItems.map(item => item.id);
+          const idsToDelete = selectedItems.map(item => item.semesterID);
 
           const chunkSize = process.env.REACT_APP_MAX_LENGHT_ARRAY_STRING;
           for (let i = 0; i < idsToDelete.length; i += chunkSize) {
@@ -158,7 +134,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
 
             const config = {
               access_token: access_token,
-              IDs: chunk,
+              semesterIDs: chunk,
             };
             const response = await DELETERequest(url, config);
             OptionMessage(response);
@@ -183,38 +159,23 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   const handleEdit = (item) => {
-    setUpdateId(item.userID);
+    setUpdateId(item.semesterID);
     setNewItem({
-      rut: item.rut,
-      firstName: item.firstName,
-      secondName: item.secondName,
-      surnameM: item.surnameM,
-      surnameF: item.surnameF,
-      sex: item.sex,
-      stateCivil: item.stateCivil,
-      birthday: item.birthday,
-      address: item.address,
-      email: item.email,
-      phone: item.phone,
+      startDate: item.startDate,
+      finishDate: item.finishDate,
+      year: item.year,
+      semesterNumber: item.semesterNumber,
     });
     openModal();
   };
 
   const clearItem = () => {
     setUpdateId(null);
-    setSelectedRoles([]);
     setNewItem({
-      rut: '',
-      firstName: '',
-      secondName: '',
-      surnameM: '',
-      surnameF: '',
-      sex: '',
-      stateCivil: '',
-      birthday: '',
-      address: '',
-      email: '',
-      phone: '',
+      startDate: null,
+      finishDate: null,
+      year: '',
+      semesterNumber: '',
     });
   };
 
@@ -228,7 +189,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
       setSelectedItems((prevSelectedItems) => [...prevSelectedItems, item]);
     } else {
       setSelectedItems((prevSelectedItems) =>
-        prevSelectedItems.filter((selectedItem) => selectedItem.userID !== item.userID)
+        prevSelectedItems.filter((selectedItem) => selectedItem.semesterID !== item.semesterID)
       );
     }
   };
@@ -289,11 +250,11 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   // -------------------------------Funciones para la Paginacion-------------------------------
-  const [searchType, setSearchType] = useState('userID');
+  const [searchType, setSearchType] = useState('semesterID');
   const [searchTerm, setSearchTerm] = useState('');
 
   const [sortDirection, setSortDirection] = useState('asc');
-  const [sortProperty, setSortProperty] = useState('userID');
+  const [sortProperty, setSortProperty] = useState('semesterID');
 
   const getCurrentPageItems = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -328,10 +289,6 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
     setMessageError(null);
     setMessageVerification(null);
   }
-  const getFormattedRoles = (roles) => {
-    return roles.split(' ').map(role => role.trim());
-  };
-
   // -------------------------------Funciones para los Modal-------------------------------
   const [ModalOpen, setModalOpen] = useState(false);
 
@@ -374,30 +331,15 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
         </tr>
       )}
       {getCurrentPageItems().map((item) => (
-        <tr key={item.userID} className='text-center'>
+        <tr key={item.semesterID} className='text-center'>
           <td className='px-4 py-2'>
-            <Checkbox id={`deleteInput-${item.userID}`} name={`deleteInput-${item.userID}`} checked={selectedItems.some((selectedItem) => selectedItem.userID === item.userID)} onChange={(e) => handleCheckboxChange(e, item)} />
+            <Checkbox id={`deleteInput-${item.semesterID}`} name={`deleteInput-${item.semesterID}`} checked={selectedItems.some((selectedItem) => selectedItem.semesterID === item.semesterID)} onChange={(e) => handleCheckboxChange(e, item)} />
           </td>
-          <td className='px-4 py-2'>{item.userID}</td>
-          <td className='px-4 py-2'>{item.rut}</td>
-          <td className='px-4 py-2'>{item.firstName}</td>
-          <td className='px-4 py-2'>{item.secondName}</td>
-          <td className='px-4 py-2'>{item.surnameM}</td>
-          <td className='px-4 py-2'>{item.surnameF}</td>
-          <td className='px-4 py-2'>{item.sex}</td>
-          <td className='px-4 py-2'>{item.stateCivil}</td>
-          <td className='px-4 py-2'>{item.birthday}</td>
-          <td className='px-4 py-2'>{item.address}</td>
-          <td className='px-4 py-2'>{item.email}</td>
-          <td className='px-4 py-2'>{item.phone}</td>
-          <td className='px-4 py-2'>{item.entry}</td>
-          <td className="whitespace-nowrap px-4 py-2 font-medium">
-            {getFormattedRoles(item.roles).map((role, index) => (
-              <span key={index} className={`mr-1 px-2.5 py-0.5 rounded ${role === 'Director' ? 'bg-blue-200 text-blue-800' : role === 'Encargado' ? 'bg-green-200 text-green-800' : role === 'Academico' ? 'bg-yellow-200 text-yellow-800' : role === 'Estudiante' ? 'bg-sky-200 text-sky-800' : 'bg-gray-100 text-gray-800'}`} >
-                {role}
-              </span>
-            ))}
-          </td>
+          <td className='px-4 py-2'>{item.semesterID}</td>
+          <td className='px-4 py-2'>{item.year}</td>
+          <td className='px-4 py-2'>{item.semesterNumber}</td>
+          <td className='px-4 py-2'>{item.startDate}</td>
+          <td className='px-4 py-2'>{item.finishDate}</td>
           <td className='px-4 py-2'>
             <div className='flex gap-2'>
               <CustomButton onClick={() => handleEdit(item)} type='button' color='orange' padding_x='4' padding_smx='6' padding_mdx='8' padding_y='2' width='full' height='10'>
@@ -421,33 +363,31 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
 
       <ModalCRUD isOpen={ModalOpen}>
         <FormContainer updateId={updateId} itemName={itemName} pText={''} handleSubmit={handleSubmit} closeModal={closeModal}>
-          <TextInput inputId='emailUser' value={newItem.email} onChange={(e) => setNewItem({ ...newItem, email: e.target.value })} placeholder={`Ingresar Email`} />
-          {(!updateId) && (<MultiSelect selectId="roles" placeholder="Seleccione Roles" options={roles} selectedRoles={selectedRoles} setSelectedRoles={setSelectedRoles} />
-          )}
-          <TextInput inputId='rut' value={newItem.rut} onChange={(e) => setNewItem({ ...newItem, rut: e.target.value })} placeholder={`Ingresar Rut`} />
-          <div className='flex gap-1 sm:gap-2'>
-            <div className='flex-1'>
-              <TextInput inputId='firstName' value={newItem.firstName} onChange={(e) => setNewItem({ ...newItem, firstName: e.target.value })} placeholder={`Ingresar Primer Nombre`} />
-            </div>
-            <div className='flex-1'>
-              <TextInput inputId='secondName' value={newItem.secondName} onChange={(e) => setNewItem({ ...newItem, secondName: e.target.value })} placeholder={`Ingresar Segundo Nombre`} />
-            </div>
-          </div>
-          <div className='flex gap-1 sm:gap-2'>
-            <div className='flex-1'>
-              <TextInput inputId='surnameM' value={newItem.surnameM} onChange={(e) => setNewItem({ ...newItem, surnameM: e.target.value })} placeholder={`Ingresar Primer Apellido`} />
-            </div>
-            <div className='flex-1'>
-              <TextInput inputId='surnameF' value={newItem.surnameF} onChange={(e) => setNewItem({ ...newItem, surnameF: e.target.value })} placeholder={`Ingresar Segundo Apellido`} />
-            </div>
-          </div>
-          <div className='flex'>
-            <DynamicSelect selectId='sex' label="Seleccione Sexo" options={validGenders} value={newItem.sex} onChange={(e) => setNewItem({ ...newItem, sex: e.target.value })} />
-            <DynamicSelect selectId='stateCivil' label="Seleccione Estado Civil" options={validMaritalStatuses} value={newItem.stateCivil} onChange={(e) => setNewItem({ ...newItem, stateCivil: e.target.value })} />
-          </div>
-          <TextInput inputId='birthday' value={newItem.birthday} onChange={(e) => setNewItem({ ...newItem, birthday: e.target.value })} placeholder={`Ingresar Fecha de Cumpleaños`} />
-          <TextInput inputId='address' value={newItem.address} onChange={(e) => setNewItem({ ...newItem, address: e.target.value })} placeholder={`Ingresar la Dirección`} />
-          <TextInput inputId='phone' value={newItem.phone} onChange={(e) => setNewItem({ ...newItem, phone: e.target.value })} placeholder={`Ingresar Telefono`} />
+          <TextInput
+            inputId='yearSemester'
+            value={newItem.year}
+            onChange={(e) => setNewItem({ ...newItem, year: e.target.value })}
+            placeholder={`Ingresar Año del Semestre`}
+          />
+          <SearchSelect
+            selectId='typeID'
+            placeholder="Seleccione Tipo de Semestre"
+            options={semester}
+            value={newItem.semesterNumber}
+            onChange={(selectedOption) => setNewItem({ ...newItem, semesterNumber: selectedOption.value })}
+          />
+          <DateInput
+            selectId={'startDate'}
+            placeholderText={'Selecciona una Fecha de Inicio'}
+            value={newItem.startDate}
+            onChange={(selectedDate) => setNewItem({ ...newItem, startDate: selectedDate })}
+          />
+          <DateInput
+            selectId={'finishDate'}
+            placeholderText={'Selecciona una Fecha de Finalización'}
+            value={newItem.finishDate}
+            onChange={(selectedDate) => setNewItem({ ...newItem, finishDate: selectedDate })}
+          />
         </FormContainer>
       </ModalCRUD>
 
@@ -456,12 +396,13 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
 
         <SearchWithSelect selectId={`${searchType}`} searchTerm={searchTerm} setSearchTerm={setSearchTerm} searchType={searchType} setSearchType={setSearchType} options={options} />
 
-        <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
+        <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()}/>
 
         <Table theadContent={theadContent} tbodyContent={tbodyContent} />
+
       </div>
     </div>
   );
 };
 
-export default UserCRUD;
+export default SemesterCRUD;

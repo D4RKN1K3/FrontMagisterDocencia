@@ -41,7 +41,6 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
     address: '',
     email: '',
     phone: '',
-    entry: '',
     id: '',
   });
 
@@ -59,6 +58,7 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
     { label: `Email del ${itemName}`, value: 'email' },
     { label: `Telefono del ${itemName}`, value: 'phone' },
     { label: `Fecha de Creacion`, value: 'entry' },
+    { label: `Titulos del ${itemName}`, value: 'titlesName' },
   ];
   const validMaritalStatuses = ['Soltero/a', 'Casado/a', 'Divorciado/a', 'Viudo/a', 'Otro'];
   const validGenders = ['Masculino', 'Femenino', 'No binario', 'Otro'];
@@ -68,7 +68,6 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = parseInt(process.env.REACT_APP_ITEMS_PER_PAGE, 10);
-  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
 
   // -------------------------------Funciones Para CRUD-------------------------------
   const fetchItems = async () => {
@@ -303,31 +302,27 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
     return filteredItems.length;
   }
 
-  const handleSortPropertyChange = (property) => {
-    // Si usuario selecciona una nueva propiedad de ordenamiento, pero es diferente a la propiedad actual,
-    // establecer la dirección de ordenamiento en 'asc' (ascendente)
-    if (property !== sortProperty) {
-      setSortDirection('asc');
+  const renderTitles = (titlesName) => {
+    if (titlesName == null) {
+      return null;
     }
-    // Si usuario selecciona una nueva propiedad de ordenamiento y es la misma que la propiedad actual,
-    // alternar la dirección de ordenamiento entre 'asc' y 'desc'
-    else {
-      setSortDirection((prevDirection) => (prevDirection === 'asc' ? 'desc' : 'asc'));
+
+    const titlesArray = titlesName.split(',').map((title) => title.trim());
+
+    const groups = [];
+    for (let i = 0; i < titlesArray.length; i += 6) {
+      groups.push(titlesArray.slice(i, i + 6));
     }
-    // Establecer la nueva propiedad de ordenamiento seleccionada
-    setSortProperty(property);
-  };
 
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
+    return groups.map((group, index) => (
+      <div key={index} className="flex gap-1">
+        {group.map((title, index) => (
+          <div key={index} className="break-words font-medium w-40 h-max px-2 py-1.5 rounded-lg bg-orange-500 text-white">
+            {title}
+          </div>
+        ))}
+      </div>
+    ));
   };
 
   // -------------------------------Funciones de Extra-------------------------------
@@ -468,8 +463,6 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
           options={options}
         />
 
-        <p className='my-2 text-gray-500 sm:text-lg'>Mostrando {getNumberFiltered()} de {items.length} elementos después de aplicar los filtros.</p>
-
         {items.length !== 0 && (
           <div className='my-2 flex flex-col items-center gap-1 sm:gap-2 sm:flex-row sm:justify-center'>
             <div className='flex-1 w-full'>
@@ -494,6 +487,8 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
           </div>
         )}
 
+        <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
+
         <div className='overflow-x-auto'>
           <table className='min-w-full divide-y-2 divide-gray-200 bg-white text-sm mt-4'>
             <thead className='ltr:text-left rtl:text-right'>
@@ -511,7 +506,10 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
                     <div className='flex items-center justify-center text-center gap-1'>
                       {option.label}
                       <SortButton
-                        onClick={() => handleSortPropertyChange(option.value)}
+                        value={option.value}
+                        sortProperty={sortProperty}
+                        setSortProperty={setSortProperty}
+                        setSortDirection={setSortDirection}
                         isActive={sortProperty === option.value}
                         isAscending={sortDirection === 'asc'}
                       />
@@ -554,6 +552,9 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
                   <td className='px-4 py-2'>{item.email}</td>
                   <td className='px-4 py-2'>{item.phone}</td>
                   <td className='px-4 py-2'>{item.entry}</td>
+                  <td className='px-4 py-2'>
+                    {renderTitles(item.titlesName)}
+                  </td>
                   <td className='px-4 py-2 flex gap-2'>
                     <div className='w-40'>
                       <CustomButton
@@ -628,8 +629,6 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
             </tbody>
           </table>
         </div>
-
-        <PaginationButtons currentPage={currentPage} totalPages={totalPages} handlePrevPage={handlePrevPage} handleNextPage={handleNextPage} handlePageChange={handlePageChange}/>
       </div>
     </div>
   );

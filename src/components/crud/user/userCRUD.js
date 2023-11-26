@@ -80,7 +80,6 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = parseInt(process.env.REACT_APP_ITEMS_PER_PAGE, 10);
-  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
 
   // -------------------------------Funciones Para CRUD-------------------------------
   const fetchItems = async () => {
@@ -303,7 +302,6 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
   const getCurrentPageItems = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    console.log('startIndex:', startIndex, 'endIndex:', endIndex);
 
     // Filtrar y ordenar los elementos según término de búsqueda y tipo de búsqueda seleccionado
     const filteredItems = filterItems(items, searchTerm, searchType);
@@ -317,33 +315,6 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
     const filteredItems = filterItems(items, searchTerm, searchType);
     return filteredItems.length;
   }
-
-  const handleSortPropertyChange = (property) => {
-    // Si usuario selecciona una nueva propiedad de ordenamiento, pero es diferente a la propiedad actual,
-    // establecer la dirección de ordenamiento en 'asc' (ascendente)
-    if (property !== sortProperty) {
-      setSortDirection('asc');
-    }
-    // Si usuario selecciona una nueva propiedad de ordenamiento y es la misma que la propiedad actual,
-    // alternar la dirección de ordenamiento entre 'asc' y 'desc'
-    else {
-      setSortDirection((prevDirection) => (prevDirection === 'asc' ? 'desc' : 'asc'));
-    }
-    // Establecer la nueva propiedad de ordenamiento seleccionada
-    setSortProperty(property);
-  };
-
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
 
   // -------------------------------Funciones de Extra-------------------------------
 
@@ -495,8 +466,6 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
           options={options}
         />
 
-        <p className='my-2 text-gray-500 sm:text-lg'>Mostrando {getNumberFiltered()} de {items.length} elementos después de aplicar los filtros.</p>
-
         {items.length !== 0 && (
           <div className='my-2 flex flex-col items-center gap-1 sm:gap-2 sm:flex-row sm:justify-center'>
             <div className='flex-1 w-full'>
@@ -521,6 +490,8 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
           </div>
         )}
 
+        <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
+
         <div className='overflow-x-auto'>
           <table className='min-w-full divide-y-2 divide-gray-200 bg-white text-sm mt-4'>
             <thead className='ltr:text-left rtl:text-right'>
@@ -538,7 +509,10 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
                     <div className='flex items-center justify-center text-center gap-1'>
                       {option.label}
                       <SortButton
-                        onClick={() => handleSortPropertyChange(option.value)}
+                        value={option.value}
+                        sortProperty={sortProperty}
+                        setSortProperty={setSortProperty}
+                        setSortDirection={setSortDirection}
                         isActive={sortProperty === option.value}
                         isAscending={sortDirection === 'asc'}
                       />
@@ -615,11 +589,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
                         height='10'
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                          />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                         </svg>
                         Actualizar
                       </CustomButton>
@@ -636,8 +606,6 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
             </tbody>
           </table>
         </div>
-
-        <PaginationButtons currentPage={currentPage} totalPages={totalPages} handlePrevPage={handlePrevPage} handleNextPage={handleNextPage} handlePageChange={handlePageChange}/>
       </div>
     </div>
   );

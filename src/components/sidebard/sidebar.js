@@ -24,8 +24,7 @@ const Sidebar = ({ navigationUser, navigation }) => {
 
   return (
     <div
-      className="border-e fixed top-0 left-0 flex h-full w-16 flex-col justify-between bg-zinc-900"
-      style={{ zIndex: 9999 }}
+      className="fixed top-0 left-0 flex h-screen w-16 flex-col justify-between bg-zinc-900 z-50"
     >
       <div>
         <div className="inline-flex h-16 w-16 items-center justify-center">
@@ -103,7 +102,7 @@ const Sidebar = ({ navigationUser, navigation }) => {
               style={{ pointerEvents: 'none' }}
               className="ms-4 absolute top-1/2 ml-6 w-24 -translate-y-1/2 translate-x-3/4 rounded bg-gray-900 py-1.5 text-center text-xs font-medium text-white opacity-0 group-hover:opacity-100"
             >
-              Cerrar Sesion
+              Cerrar Sesión
             </span>
           </button>
         </form>

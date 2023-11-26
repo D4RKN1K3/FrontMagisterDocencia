@@ -4,6 +4,10 @@ import FormButtons from '../../button/form/formButtons'
 import '../../../style/border.css'
 
 const FormContainer = ({
+  updateMessage,
+  createMessage,
+  update2Message,
+  create2Message,
   updateId,
   itemName,
   pText,
@@ -12,14 +16,18 @@ const FormContainer = ({
   children,
 }) => {
   return (
-    <div className="mx-auto max-w-screen items-center w-96 sm:w-full"
-    id="borderimg1"
+    <div className="mx-auto max-w-screen items-center w-80 sm:w-full"
+      id="borderimg1"
     >
       <form
         onSubmit={handleSubmit}
-        className="mb-0 space-y-4 rounded-lg p-2 sm:p-4 lg:p-6"
+        className="mb-0 space-y-4 rounded p-4 sm:p-6"
       >
         <FormHeader
+          updateMessage={updateMessage}
+          createMessage={createMessage}
+          update2Message={update2Message}
+          create2Message={create2Message}
           updateId={updateId}
           itemName={itemName}
           pText={pText}
@@ -28,6 +36,8 @@ const FormContainer = ({
         <div className="space-y-1 sm:space-y-2">{children}</div>
 
         <FormButtons
+          updateMessage={updateMessage}
+          createMessage={createMessage}
           handleSubmit={handleSubmit}
           closeModal={closeModal}
           updateId={updateId}

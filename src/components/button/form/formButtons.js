@@ -1,9 +1,11 @@
 import React from 'react';
 import CustomButton from '../customButton';
 
-const FormButtons = ({ handleSubmit, closeModal, updateId, itemName }) => {
+const FormButtons = ({ updateMessage, createMessage, handleSubmit, closeModal, updateId, itemName }) => {
+    const buttonText = updateId ? (updateMessage || `Actualizar ${itemName}`) : (createMessage || `Crear ${itemName}`);
+
     return (
-        <div className="flex flex-col items-center gap-1 sm:gap-2 sm:flex-row sm:justify-center">
+        <div className="flex flex-col items-center gap-1 sm:flex-row sm:justify-center">
             <div className="flex-1 w-full sm:w-60">
                 <CustomButton
                     onClick={handleSubmit}
@@ -38,7 +40,7 @@ const FormButtons = ({ handleSubmit, closeModal, updateId, itemName }) => {
                             />
                         </svg>
                     )}
-                    {updateId ? `Actualizar ${itemName}` : `Crear ${itemName}`}
+                    {buttonText}
                 </CustomButton>
             </div>
             <div className="flex-1 w-full sm:w-60">

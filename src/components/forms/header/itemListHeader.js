@@ -20,7 +20,7 @@ const ItemListHeader = ({
         </p>
       </div>
 
-      <div className="flex flex-col items-center w-full gap-1 md:gap-2 md:flex-row md:justify-end">
+      <div className="flex flex-col items-center w-full gap-1 md:flex-row md:justify-end">
         <div className='w-full md:w-48'>
           <CustomButton
             onClick={openModal}
@@ -50,7 +50,7 @@ const ItemListHeader = ({
             Crear {itemName}
           </CustomButton>
         </div>
-        <div className='w-full md:w-16'>
+        <div className='w-full md:w-14'>
           <CustomButton
             onClick={fetchItems}
             type="button"

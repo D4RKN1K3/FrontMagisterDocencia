@@ -9,10 +9,10 @@ const LoginContainer = ({
   isAdminAccess,
 }) => {
   return (
-    <div className="mx-auto max-w-screen flex items-center justify-center">
+    <div className="mx-auto h-screen max-w-screen flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="mb-0 w-80 sm:w-96 space-y-4 rounded-lg p-2 sm:p-4 lg:p-6"
+        className="mb-0 w-full sm:w-96 space-y-2 rounded-lg p-2 sm:p-4 lg:p-6"
       >
         <div className="mx-auto max-w-lg text-center">
           <h1 className="text-2xl font-bold sm:text-4xl text-orange-500">
@@ -25,9 +25,9 @@ const LoginContainer = ({
           src={logo} alt="Logo Uta"
         />
 
-        <div className="space-y-1 sm:space-y-2">{children}</div>
+        <div className="space-y-2">{children}</div>
 
-        <div className="flex items-center justify-center gap-1 sm:gap-2">
+        <div className="flex items-center justify-center">
           <CustomButton
             onClick={handleSubmit}
             type="submit"

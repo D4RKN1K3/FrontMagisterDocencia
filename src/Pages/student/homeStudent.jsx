@@ -4,9 +4,9 @@ export const HomeStudent = () => {
 
     const sectionsData = [
         {
-            title: 'Digital Campaigns',
-            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex ut quo possimus adipisci distinctio alias voluptatum blanditiis laudantium.',
-            link: '/services/digital-campaigns',
+            title: 'Gestion de Especialización',
+            description: ' En esta sección, tendrás la capacidad de crear, actualizar y eliminar información de los usuarios. Además, podrás realizar tareas como importar y exportar datos de usuarios, modificar sus roles, y cambiar las contraseñas de los usuarios de manera eficiente y sencilla.',
+            link: '/Dashboard/Specialization/',
             icon: (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

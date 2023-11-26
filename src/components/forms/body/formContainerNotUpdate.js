@@ -14,12 +14,12 @@ const FormContainerNotUpdate = ({
   customPath,
 }) => {
   return (
-    <div className="mx-auto max-w-screen items-center w-96 sm:w-full"
+    <div className="mx-auto max-w-screen items-center w-80 sm:w-full"
       id="borderimg1"
     >
       <form
         onSubmit={handleSubmit}
-        className="mb-0 space-y-4 rounded-lg p-2 sm:p-4 lg:p-6"
+        className="mb-0 space-y-4 rounded p-4 sm:p-6"
       >
         <FormHeaderNotUpdate
           message={message}

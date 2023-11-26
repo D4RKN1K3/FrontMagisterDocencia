@@ -19,7 +19,7 @@ const CustomButton = ({
   };
 
   // Utilizamos el color seleccionado para formar las clases CSS
-  const buttonClassName = `w-${width} h-${height} text-white inline-flex items-center justify-center gap-2 rounded border transition duration-150 
+  const buttonClassName = `w-${width} h-${height} text-white inline-flex items-center justify-center gap-2 rounded-xl border transition duration-150 
   ${color === 'indigo' ? 'border-indigo-600 bg-indigo-600 hover:text-indigo-600' :
       color === 'red' ? 'border-red-500 bg-red-500 hover:text-red-500' :
         color === 'yellow' ? 'border-yellow-400 bg-yellow-400 hover:text-yellow-400' :
@@ -28,7 +28,7 @@ const CustomButton = ({
 
     } 
           
-  px-${padding_x} sm:px-${padding_smx} md:px-${padding_mdx} py-${padding_y} text-sm font-medium hover:bg-transparent focus:outline-none focus:ring`;
+  px-${padding_x} sm:px-${padding_smx} md:px-${padding_mdx} py-${padding_y} sm:text-sm font-medium hover:bg-transparent focus:outline-none focus:ring`;
 
   return (
     <button type={type} className={buttonClassName} onClick={handleClick}>

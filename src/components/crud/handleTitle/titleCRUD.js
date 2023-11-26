@@ -54,7 +54,6 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = parseInt(process.env.REACT_APP_ITEMS_PER_PAGE, 10);
-  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
 
   // -------------------------------Funciones Para CRUD-------------------------------
   const fetchItems = async () => {
@@ -360,33 +359,6 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
     return filteredItems.length;
   }
 
-  const handleSortPropertyChange = (property) => {
-    // Si usuario selecciona una nueva propiedad de ordenamiento, pero es diferente a la propiedad actual,
-    // establecer la dirección de ordenamiento en 'asc' (ascendente)
-    if (property !== sortProperty) {
-      setSortDirection('asc');
-    }
-    // Si usuario selecciona una nueva propiedad de ordenamiento y es la misma que la propiedad actual,
-    // alternar la dirección de ordenamiento entre 'asc' y 'desc'
-    else {
-      setSortDirection((prevDirection) => (prevDirection === 'asc' ? 'desc' : 'asc'));
-    }
-    // Establecer la nueva propiedad de ordenamiento seleccionada
-    setSortProperty(property);
-  };
-
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
   // -------------------------------Funciones de Extra-------------------------------
 
   const isMounted = useRef(false);
@@ -478,8 +450,7 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
           options={options}
         />
 
-        <p className='mt-4 text-gray-500 sm:text-lg'>Mostrando {getNumberFiltered()} de {items.length} elementos después de aplicar los filtros.</p>
-
+        <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
         <div className='overflow-x-auto'>
           <table className='min-w-full divide-y-2 divide-gray-200 bg-white text-sm mt-4'>
             <thead className='ltr:text-left rtl:text-right'>
@@ -497,7 +468,10 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
                     <div className='flex items-center justify-center text-center gap-1'>
                       {option.label}
                       <SortButton
-                        onClick={() => handleSortPropertyChange(option.value)}
+                        value={option.value}
+                        sortProperty={sortProperty}
+                        setSortProperty={setSortProperty}
+                        setSortDirection={setSortDirection}
                         isActive={sortProperty === option.value}
                         isAscending={sortDirection === 'asc'}
                       />
@@ -528,7 +502,7 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
                     />
                   </td>
                   <td className='px-4 py-2'>{item.titleID}</td>
-                  <td className='px-4 py-2'>{item.name}</td>
+                  <td className='whitespace-nowrap px-4 py-2'>{item.name}</td>
                   <td className='px-4 py-2'>{item.typeID}</td>
                   <td className='px-4 py-2'>{item.universityID}</td>
                   <td className='px-4 py-2'>{item.nameUniversity}</td>
@@ -564,8 +538,6 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
             </tbody>
           </table>
         </div>
-
-        <PaginationButtons currentPage={currentPage} totalPages={totalPages} handlePrevPage={handlePrevPage} handleNextPage={handleNextPage} handlePageChange={handlePageChange}/>
       </div>
     </div >
   );
