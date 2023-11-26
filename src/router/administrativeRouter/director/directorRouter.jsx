@@ -6,8 +6,6 @@ import { Academic } from '../../../Pages/administrative/director/academic/academ
 import { Student } from '../../../Pages/administrative/director/student/student';
 import { Document } from '../../../Pages/administrative/director/student/document/document';
 import { HandleTitle } from '../../../Pages/administrative/director/student/handleTitle/handleTitle';
-import { Title } from '../../../Pages/administrative/director/title/title';
-import { Semester } from '../../../Pages/administrative/director/semester/semester';
 
 const DirectorRouter = () => {
   return (
@@ -19,8 +17,6 @@ const DirectorRouter = () => {
         <Route path="Student" element={<Student />} />
         <Route path="Document/:roleHasUserID" element={<Document />} />
         <Route path="HandleTitle/:userID" element={<HandleTitle />} />
-        <Route path="Title" element={<Title />} />
-        <Route path="Semester" element={<Semester />} />
       </Route>
     </Routes>
   );

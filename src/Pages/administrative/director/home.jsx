@@ -55,9 +55,9 @@ export const Home = () => {
             ),
         },
         {
-            title: 'Gestión de Títulos',
-            description: 'En esta sección, tendrás la capacidad de crear, actualizar y eliminar información de los títulos de manera eficiente y sencilla.',
-            link: '/Administrative/Director/Title',
+            title: 'Digital Campaigns',
+            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex ut quo possimus adipisci distinctio alias voluptatum blanditiis laudantium.',
+            link: '/services/digital-campaigns',
             icon: (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -72,9 +72,9 @@ export const Home = () => {
             ),
         },
         {
-            title: 'Gestión de Semestres',
-            description: 'En esta sección, tendrás la capacidad de crear, actualizar y eliminar información de los semestres de manera eficiente y sencilla.',
-            link: '/Administrative/Director/Semester',
+            title: 'Digital Campaigns',
+            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex ut quo possimus adipisci distinctio alias voluptatum blanditiis laudantium.',
+            link: '/services/digital-campaigns',
             icon: (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
