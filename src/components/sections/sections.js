@@ -40,7 +40,7 @@ function Sections({ title, description, sections }) {
                                 {section.icon}
                                 <h2 className="mt-4 text-xl font-bold text-gray-900">{section.title}</h2>
                             </div>
-                            <p className="mt-1 text-sm text-gray-500">{section.description}</p>
+                            <p className="break-words mt-1 text-sm text-gray-500 text-justify">{section.description}</p>
                         </Link>
                     ))}
                 </div>

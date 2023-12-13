@@ -28,7 +28,7 @@ import FileIcon from '../../image/fileIcon';
 const DocumentCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
-  const { roleHasUserID } = useParams();
+  const { userID } = useParams();
 
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState({
@@ -60,7 +60,7 @@ const DocumentCRUD = ({ name, urls, title, subtitle }) => {
         setMessageWaiting(true);
         const config = {
           access_token,
-          roleHasUserID,
+          userID,
         };
 
         const response = await GETRequest(url, config);
@@ -88,7 +88,7 @@ const DocumentCRUD = ({ name, urls, title, subtitle }) => {
           setMessageWaiting(true);
           const config = {
             access_token,
-            roleHasUserID,
+            userID,
             ...newItem,
           };
           const response = await POSTFileRequest(url, config, selectedFile);
@@ -211,8 +211,11 @@ const DocumentCRUD = ({ name, urls, title, subtitle }) => {
     if (data.verificationMessage) {
       setMessageVerification(data.verificationMessage);
       fetchItems();
-
       closeModal();
+    }
+    else if (data.renewalMessage) {
+      setMessageVerification(data.renewalMessage);
+      await fetchItems();
     }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
@@ -285,7 +288,7 @@ const DocumentCRUD = ({ name, urls, title, subtitle }) => {
 
   const isMounted = useRef(false);
   useEffect(() => {
-    if (roleHasUserID) {
+    if (userID) {
       if (!isMounted.current) {
         isMounted.current = true;
         // Coloca el código que deseas ejecutar solo una vez aquí
@@ -293,7 +296,7 @@ const DocumentCRUD = ({ name, urls, title, subtitle }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roleHasUserID]);
+  }, [userID]);
 
   const [messageError, setMessageError] = useState(null);
   const [messageVerification, setMessageVerification] = useState(null);
@@ -354,7 +357,7 @@ const DocumentCRUD = ({ name, urls, title, subtitle }) => {
           setSearchType={setSearchType}
           options={options}
         />
-        <FilterPanel>
+        <FilterPanel message={'Ordenar Documentos'}>
           <ul className="border-t border-gray-200 p-2 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4">
             {options.map((option) => (
               <li key={option.value} className="inline-flex start-center md:justify-center items-center my-1 md:my-2 gap-2">
@@ -376,7 +379,7 @@ const DocumentCRUD = ({ name, urls, title, subtitle }) => {
 
         <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
 
-        <ItemsList itemName={itemName} selectAll={selectAll} handleSelectAllChange={handleSelectAllChange}>
+        <ItemsList message={'Selecionar Todos los Documentos del Estudiante'} selectAll={selectAll} handleSelectAllChange={handleSelectAllChange}>
           <>
             {items.length === 0 && messageWaiting && (
               <div colSpan={options.length} className="w-full h-96 translate-x-1/2 translate-y-1/2">

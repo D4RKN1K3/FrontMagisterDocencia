@@ -209,6 +209,12 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
       fetchItems();
       closeModal();
     }
+    else if (data.renewalMessage) {
+      setMessageVerification(data.renewalMessage);
+      await fetchItems();
+      fetchItemsSelect('type', urls[1]);
+      fetchItemsSelect('university', urls[2]);
+    }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
       deniedSession(navigate);

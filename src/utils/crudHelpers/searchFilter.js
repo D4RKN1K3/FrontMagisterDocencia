@@ -1,3 +1,31 @@
+export const filterItemsByDateRange = (items, startDate, endDate, datePropertyName) => {
+    if (!Array.isArray(items) || !items) {
+      return [];
+    }
+  
+    if (!startDate || !endDate) {
+      // Si startDate o endDate no están definidos, devolver el array original sin filtrar
+      return items;
+    }
+  
+    return items.filter((item) => {
+      const propValue = item[datePropertyName];
+  
+      if (propValue instanceof Date) {
+        // Si la propiedad es de tipo Date, comparar directamente las fechas
+        return propValue >= startDate && propValue <= endDate;
+      } else if (typeof propValue === 'string') {
+        // Si la propiedad es de tipo string (puede ser un timestamptz), convertir a Date y comparar
+        const propDate = new Date(propValue);
+        return !isNaN(propDate.getTime()) && propDate >= startDate && propDate <= endDate;
+      }
+  
+      return false;
+    });
+  };
+  
+
+
 // Función para filtrar los elementos según el término de búsqueda y el tipo de búsqueda seleccionado
 const checkInclusion = (targetString, searchString) => {
     const targetArray = targetString.split(',').map((item) => item.trim().toLowerCase());

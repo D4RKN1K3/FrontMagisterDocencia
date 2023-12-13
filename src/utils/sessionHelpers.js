@@ -21,7 +21,7 @@ export const renewSession = async () => {
             Cookies.set('refresh_token', session.refresh_token);
 
             return {
-                verificationMessage: "La sesión ha sido renovada.",
+                renewalMessage: "La sesión ha sido renovada.",
             }
         }
 

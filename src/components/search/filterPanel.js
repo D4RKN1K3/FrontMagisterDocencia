@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const FilterPanel = ({ children }) => {
+const FilterPanel = ({ message, children }) => {
     const [isAvailabilityOpen, setIsAvailabilityOpen] = useState(false);
 
     return (
@@ -13,7 +13,7 @@ const FilterPanel = ({ children }) => {
                     type="button"
                     className="flex h-10 w-full cursor-pointer items-center justify-between gap-2 bg-white p-4 text-gray-900 transition"
                 >
-                    <span className="text-sm text-gray-700 font-medium">Ordenar Elementos</span>
+                    <span className="text-sm text-gray-700 font-medium">{message}</span>
                     <span
                         className={`transition ${isAvailabilityOpen ? '-rotate-180' : ''
                             }`}

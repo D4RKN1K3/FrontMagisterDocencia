@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 
 const PaginationTabButtons = ({
     items,
@@ -29,6 +29,11 @@ const PaginationTabButtons = ({
         setCurrentTab(0);
         setSearchTerm('');
     };
+
+    useEffect(() => {
+        handlePageDefaultChange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const length = items.length;
     const totalPages = Math.ceil(length / itemsPerPage);

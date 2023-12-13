@@ -1,7 +1,6 @@
 import React from 'react';
 import FormHeader from '../header/formHeader';
 import FormButtons from '../../button/form/formButtons'
-import '../../../style/border.css'
 
 const FormContainer = ({
   updateMessage,
@@ -16,8 +15,7 @@ const FormContainer = ({
   children,
 }) => {
   return (
-    <div className="mx-auto max-w-screen items-center w-80 sm:w-full"
-      id="borderimg1"
+    <div className="mx-auto items-center w-80 sm:w-full"
     >
       <form
         onSubmit={handleSubmit}

@@ -9,8 +9,8 @@ const SearchWithSelect = ({
     options,
 }) => {
     return (
-        <div className='flex flex-col items-center gap-1 sm:flex-row'>
-            <div className='flex-1 w-full sm:w-auto'>
+        <div className='grid grid-cols-5 items-center gap-1'>
+            <div className='col-span-full sm:col-span-4 w-full sm:w-auto'>
                 <div className="relative z-1">
                     <label htmlFor={selectId} className="sr-only">
                         {selectId}
@@ -22,7 +22,7 @@ const SearchWithSelect = ({
                         placeholder="Buscar..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="h-10 w-full rounded-md border-gray-200 py-2.5 pl-10 pr-3 shadow-sm sm:text-sm"
+                        className="h-9 sm:h-10 w-full rounded-md border-gray-200 py-2.5 pl-10 pr-3 shadow-sm text-xs sm:text-sm text-start"
                         autoComplete="on"
                     />
                     <svg
@@ -42,11 +42,11 @@ const SearchWithSelect = ({
                 </div>
             </div>
 
-            <div className='flex-2 w-full sm:w-auto'>
+            <div className='col-span-full sm:col-span-1 w-full sm:w-auto'>
                 <select
                     id="searchSelect"
                     name="searchSelect"
-                    className="h-10 w-full rounded-lg border-gray-300 text-gray-700 text-sm"
+                    className="h-9 sm:h-10 w-full rounded-lg border-gray-300 text-gray-700 text-xs sm:text-sm text-start"
                     value={searchType}
                     onChange={(e) => setSearchType(e.target.value)}
                 >

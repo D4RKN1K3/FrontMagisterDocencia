@@ -6,7 +6,7 @@ import Alert from '../../../alert/alert';
 import AlertVerification from '../../../alert/alertVerification';
 import WaitingAlert from '../../../alert/waitingAlert';
 
-import { GETRequest, POSTRequest, PUTRequest } from '../../../../utils/requestHelpers';
+import { GETRequest, PUTRequest } from '../../../../utils/requestHelpers';
 import { filterMultipleItems, sortItems } from '../../../../utils/crudHelpers/searchFilter';
 import { renewSession, deniedSession } from '../../../../utils/sessionHelpers';
 import ModalCRUD from '../../../modal/modalCRUD';
@@ -26,10 +26,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
 
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState({
-    academic1_roleHasUserID: '',
-    academic2_roleHasUserID: '',
-    academic3_roleHasUserID: '',
-    evaluationStatusID: 2,
+    evaluationStatusID: '',
   });
 
   const options = [
@@ -75,24 +72,6 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
     }
   };
 
-  const handleCreate = async () => {
-    try {
-      const url = urls[0];
-      const access_token = Cookies.get('access_token');
-      if (access_token) {
-        setMessageWaiting(true);
-        const config = { ...newItem, access_token };
-        const response = await POSTRequest(url, config);
-        OptionMessage(response);
-      } else {
-        setMessageError('No tienes una session');
-      }
-    } catch (error) {
-      setMessageWaiting(false);
-      setMessageError(`Error creating ${itemName}:` + error.message);
-    }
-  };
-
   const handleUpdate = async () => {
     if (updateId === null) return;
 
@@ -119,30 +98,13 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (updateId !== null) {
-      await handleUpdate();
-    } else {
-      await handleCreate();
-    }
+    await handleUpdate();
   };
 
   const handleEdit = (item) => {
     setUpdateId(item.specializationHasUserID);
     setNewItem({
-      academic1_roleHasUserID: item.academic1_roleHasUserID,
-      academic2_roleHasUserID: item.academic2_roleHasUserID,
-      academic3_roleHasUserID: item.academic3_roleHasUserID,
-      evaluateHasUser1ID: item.evaluateHasUser1ID,
-      evaluateHasUser2ID: item.evaluateHasUser2ID,
-      evaluateHasUser3ID: item.evaluateHasUser3ID,
-    });
-    openModal();
-  };
-
-  const handleCreation = (item) => {
-    setNewItem({
-      ...newItem,
-      specializationHasUserID: item.specializationHasUserID,
+      evaluationStatusID: item.evaluationStatusID
     });
     openModal();
   };
@@ -150,10 +112,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   const clearItem = () => {
     setUpdateId(null);
     setNewItem({
-      academic1_roleHasUserID: '',
-      academic2_roleHasUserID: '',
-      academic3_roleHasUserID: '',
-      evaluationStatusID: 2,
+      evaluationStatusID: '',
     });
   };
 
@@ -161,7 +120,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
     setMessageWaiting(false);
     if (data.verificationMessage) {
       setMessageVerification(data.verificationMessage);
-      fetchItemsSelect('academics', urls[1]);
+      fetchItemsSelect('evaluationStatus', urls[1]);
       fetchItemsSelect('semester', urls[2]);
       fetchItems();
       closeModal();
@@ -169,7 +128,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
     else if (data.renewalMessage) {
       setMessageVerification(data.renewalMessage);
       await fetchItems();
-      fetchItemsSelect('academics', urls[1]);
+      fetchItemsSelect('evaluationStatus', urls[1]);
       fetchItemsSelect('semester', urls[2]);
     }
     else if (data.errorDenied) {
@@ -215,7 +174,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   const [semester, setSemester] = useState([]);
-  const [academics, setAcademics] = useState([]);
+  const [evaluationStatus, setevaluationStatus] = useState([]);
 
   const fetchItemsSelect = async (nameSelect, url) => {
     try {
@@ -225,7 +184,6 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
         const config = {
           access_token,
         };
-
         const response = await GETRequest(url, config);
         OptionMessageSelect(nameSelect, response);
       } else {
@@ -278,13 +236,13 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       }
     }
     else if (data) {
-      if (nameSelect === 'academics') {
-        const sortedItems = sortItems(data, 'specializationHasUserID', 'asc');
+      if (nameSelect === 'evaluationStatus') {
+        const sortedItems = sortItems(data, 'evaluationStatusID', 'asc');
         const format = sortedItems.map(item => ({
-          value: item.roleHasUserID,
-          label: `${item.firstName} ${item.secondName} ${item.surnameM} ${item.surnameF}`,
+          value: item.evaluationStatusID,
+          label: `${item.name}`,
         }));
-        setAcademics(format);
+        setevaluationStatus(format);
       }
       else if (nameSelect === 'semester') {
         const sortedItems = sortItems(data, 'finishDate', 'desc');
@@ -334,7 +292,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       isMounted.current = true;
       // Coloca el código que deseas ejecutar solo una vez aquí
       fetchItems();
-      fetchItemsSelect('academics', urls[1]);
+      fetchItemsSelect('evaluationStatus', urls[1]);
       fetchItemsSelect('semester', urls[2]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -404,19 +362,12 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
           <td className='px-4 py-2'>{item.academic3_fullName}</td>
           <td className='px-4 py-2'>
             <div className='w-full flex-1 sm:w-60'>
-              {item.academic1_fullName
-                ? <CustomButton onClick={() => handleEdit(item)} type='button' color='orange' padding_x='4' padding_smx='6' padding_mdx='8' padding_y='2' width='full' height='10'>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                  </svg>
-                  Actualizar Academícos
-                </CustomButton>
-                : <CustomButton onClick={() => handleCreation(item)} type='button' color='orange' padding_x='4' padding_smx='6' padding_mdx='8' padding_y='2' width='full' height='10'>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                  </svg>
-                  Asignar Academícos
-                </CustomButton>}
+              <CustomButton onClick={() => handleEdit(item)} type='button' color='orange' padding_x='4' padding_smx='6' padding_mdx='8' padding_y='2' width='full' height='10'>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                </svg>
+                Actualizar Estado
+              </CustomButton>
             </div>
           </td>
         </tr>
@@ -441,25 +392,11 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
           closeModal={closeModal}
         >
           <SearchSelect
-            selectId='academic1_roleHasUserID'
-            placeholder="Seleccionar el Primer Academíco"
-            options={academics}
-            value={newItem.academic1_roleHasUserID}
-            onChange={(selectedOption) => setNewItem({ ...newItem, academic1_roleHasUserID: selectedOption.value })}
-          />
-          <SearchSelect
-            selectId='academic2_roleHasUserID'
-            placeholder="Seleccionar el Segundo Academíco"
-            options={academics}
-            value={newItem.academic2_roleHasUserID}
-            onChange={(selectedOption) => setNewItem({ ...newItem, academic2_roleHasUserID: selectedOption.value })}
-          />
-          <SearchSelect
-            selectId='academic3_roleHasUserID'
-            placeholder="Seleccionar el Tercer Academíco"
-            options={academics}
-            value={newItem.academic3_roleHasUserID}
-            onChange={(selectedOption) => setNewItem({ ...newItem, academic3_roleHasUserID: selectedOption.value })}
+            selectId='evaluationStatusID'
+            placeholder="Seleccionar un Estado de la Evaluacion"
+            options={evaluationStatus}
+            value={newItem.evaluationStatusID}
+            onChange={(selectedOption) => setNewItem({ ...newItem, evaluationStatusID: selectedOption.value })}
           />
         </FormContainer>
       </ModalCRUD>

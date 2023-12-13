@@ -24,7 +24,7 @@ const Sidebar = ({ navigationUser, navigation }) => {
 
   return (
     <div
-      className="fixed top-0 left-0 flex h-screen w-16 flex-col justify-between bg-zinc-900 z-50"
+      className="fixed top-0 left-0 flex h-screen w-14 flex-col justify-between bg-zinc-900 z-50"
     >
       <div>
         <div className="inline-flex h-16 w-16 items-center justify-center">

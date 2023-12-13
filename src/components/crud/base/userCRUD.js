@@ -245,6 +245,10 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
       fetchItems();
       closeModal();
     }
+    else if (data.renewalMessage) {
+      setMessageVerification(data.renewalMessage);
+      await fetchItems();
+    }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
       deniedSession(navigate);

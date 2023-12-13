@@ -25,7 +25,7 @@ import ItemsList from '../../sections/itemsList';
 
 import FileIcon from '../../image/fileIcon';
 
-const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
+const UserHasTitleCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
   const { userID } = useParams();
@@ -38,7 +38,7 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
   const [selectedItems, setSelectedItems] = useState([]);
 
   const options = [
-    { label: `Identificador de la ${itemName}`, value: 'roleHasTitleID' },
+    { label: `Identificador de la ${itemName}`, value: 'userHasTitleID' },
     { label: `Nombre del Título`, value: 'title.name' },
     { label: `Formato de la ${itemName}`, value: 'format.name' },
   ];
@@ -114,7 +114,7 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
         setMessageWaiting(true);
         const config = {
           access_token,
-          roleHasTitleID: updateId,
+          userHasTitleID: updateId,
           ...newItem,
         };
         const response = await PUTRequest(url, config);
@@ -135,7 +135,7 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
       if (access_token) {
         setMessageWaiting(true);
         if (selectedItems.length !== 0) {
-          const idsToDelete = selectedItems.map(item => item.roleHasTitleID);
+          const idsToDelete = selectedItems.map(item => item.userHasTitleID);
 
           const chunkSize = process.env.REACT_APP_MAX_LENGHT_ARRAY_NUMBER;
           for (let i = 0; i < idsToDelete.length; i += chunkSize) {
@@ -143,7 +143,7 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
 
             const config = {
               access_token: access_token,
-              roleHasTitleIDs: chunk,
+              userHasTitleIDs: chunk,
             };
             const response = await DELETERequest(url, config);
             OptionMessage(response);
@@ -168,7 +168,7 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   const handleEdit = (item) => {
-    setUpdateId(item.roleHasTitleID);
+    setUpdateId(item.userHasTitleID);
     setNewItem({
       titleID: item.titleID,
     });
@@ -192,7 +192,7 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
       setSelectedItems((prevSelectedItems) => [...prevSelectedItems, item]);
     } else {
       setSelectedItems((prevSelectedItems) =>
-        prevSelectedItems.filter((selectedItem) => selectedItem.roleHasTitleID !== item.roleHasTitleID)
+        prevSelectedItems.filter((selectedItem) => selectedItem.userHasTitleID !== item.userHasTitleID)
       );
     }
   };
@@ -207,8 +207,12 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
     if (data.verificationMessage) {
       setMessageVerification(data.verificationMessage);
       fetchItems();
-
       closeModal();
+    }
+    else if (data.renewalMessage) {
+      setMessageVerification(data.renewalMessage);
+      await fetchItems();
+      fetchItemsSelect(urls[1]);
     }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
@@ -327,11 +331,11 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   // -------------------------------Funciones para la Paginacion-------------------------------
-  const [searchType, setSearchType] = useState('roleHasTitleID');
+  const [searchType, setSearchType] = useState('userHasTitleID');
   const [searchTerm, setSearchTerm] = useState('');
 
   const [sortDirection, setSortDirection] = useState('asc');
-  const [sortProperty, setSortProperty] = useState('roleHasTitleID');
+  const [sortProperty, setSortProperty] = useState('userHasTitleID');
 
   const getCurrentPageItems = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -430,7 +434,7 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
           setSearchType={setSearchType}
           options={options}
         />
-        <FilterPanel>
+        <FilterPanel message={'Ordenar Títulos del Estudiante'}>
           <ul className="border-t border-gray-200 p-2 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4">
             {options.map((option) => (
               <li key={option.value} className="inline-flex start-center md:justify-center items-center my-1 md:my-2 gap-2">
@@ -452,7 +456,7 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
 
         <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
 
-        <ItemsList itemName={itemName} selectAll={selectAll} handleSelectAllChange={handleSelectAllChange}>
+        <ItemsList message={'Selecionar Todos los Titulos del Estudiante'} selectAll={selectAll} handleSelectAllChange={handleSelectAllChange}>
           <>
             {items.length === 0 && messageWaiting && (
               <div colSpan={options.length} className="w-full h-96 translate-x-1/2 translate-y-1/2">
@@ -460,19 +464,19 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
               </div>
             )}
             {getCurrentPageItems().map((item) => (
-              <div key={item.roleHasTitleID} className="flex flex-col justify-center text-center relative">
+              <div key={item.userHasTitleID} className="flex flex-col justify-center text-center relative">
                 <div className="absolute top-0 left-0">
                   <Checkbox
-                    id={`deleteInput-${item.roleHasTitleID}`}
-                    name={`deleteInput-${item.roleHasTitleID}`}
-                    checked={selectedItems.some((selectedItem) => selectedItem.roleHasTitleID === item.roleHasTitleID)}
+                    id={`deleteInput-${item.userHasTitleID}`}
+                    name={`deleteInput-${item.userHasTitleID}`}
+                    checked={selectedItems.some((selectedItem) => selectedItem.userHasTitleID === item.userHasTitleID)}
                     onChange={(e) => handleCheckboxChange(e, item)}
                   />
                 </div>
                 <div className="flex-1 my-2 inline-flex justify-center items-center my-1 md:my-2 gap-2">
                   <FileIcon format={item.format.name} />
                 </div>
-                <h4 className="text-xl font-semibold">{item.roleHasTitleID}</h4>
+                <h4 className="text-xl font-semibold">{item.userHasTitleID}</h4>
                 <p className="text-sm text-gray-700 mb-2">{item.title.name}</p>
 
                 <div className="flex flex-col items-center justify-center gap-2">
@@ -525,4 +529,4 @@ const RoleHasTitleCRUD = ({ name, urls, title, subtitle }) => {
   );
 };
 
-export default RoleHasTitleCRUD;
+export default UserHasTitleCRUD;

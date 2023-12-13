@@ -14,7 +14,7 @@ const FormHeader = ({ updateMessage, createMessage, update2Message, create2Messa
                 {secondaryHeaderText}
             </h2>
 
-            <p className="mx-auto mt-4 max-w-md text-center text-gray-500">{pText}</p>
+            <p className="mx-auto mt-1 max-w-md text-center text-gray-500">{pText}</p>
         </div>
     );
 };

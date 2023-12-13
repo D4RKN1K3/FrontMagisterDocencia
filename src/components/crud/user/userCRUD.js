@@ -10,10 +10,11 @@ import IconOnlyAlert from '../../alert/iconOnlyAlert'
 import CustomButton from '../../button/customButton';
 
 import { GETRequest, POSTRequest, PUTRequest, DELETERequest } from '../../../utils/requestHelpers';
-import { filterItems, sortItems } from '../../../utils/crudHelpers/searchFilter';
+import { filterItems, sortItems, filterItemsByDateRange } from '../../../utils/crudHelpers/searchFilter';
 import { renewSession, deniedSession } from '../../../utils/sessionHelpers';
 import ItemListHeader from '../../forms/header/itemListHeader';
 import SearchWithSelect from '../../search/searchWithSelect';
+import DateRangeSearch from '../../search/dateRangeSearch';
 import SortButton from '../../sort/sortButton';
 import PaginationButtons from '../../button/table/paginationButtons';
 import FormContainer from '../../forms/body/formContainer';
@@ -46,25 +47,36 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
     phone: '',
     entry: '',
     id: '',
+    placeWork: '',
+    phoneWork: '',
+    job: '',
     roles: '',
   });
 
   const options = [
     { label: `Identificador del ${itemName}`, value: 'userID' },
     { label: `Rut del ${itemName}`, value: 'rut' },
+    { label: `Email del ${itemName}`, value: 'email' },
     { label: `Primer Nombre`, value: 'firstName' },
     { label: `Segundo Nombre`, value: 'secondName' },
     { label: `Primer Apellido`, value: 'surnameM' },
     { label: `Segundo Apellido`, value: 'surnameF' },
     { label: `Sexo`, value: 'sex' },
     { label: `Estado Civil`, value: 'stateCivil' },
-    { label: `Fecha de Cumpleaños`, value: 'birthday' },
+    { label: `Fecha de Nacimiento`, value: 'birthday' },
     { label: `Direccion`, value: 'address' },
-    { label: `Email del ${itemName}`, value: 'email' },
-    { label: `Telefono del ${itemName}`, value: 'phone' },
+    { label: `Lugar de Trabajo`, value: 'placeWork' },
+    { label: `Teléfono del ${itemName}`, value: 'phone' },
+    { label: `Teléfono del Trabajo`, value: 'phoneWork' },
+    { label: `Cargo de Trabajo`, value: 'job' },
     { label: `Fecha de Creacion`, value: 'entry' },
     { label: `Roles de ${itemName}`, value: 'roles' },
   ];
+  const options2 = [
+    { label: `Fecha de Nacimiento`, value: 'birthday' },
+    { label: `Fecha de Creacion`, value: 'entry' },
+  ];
+
   const validMaritalStatuses = ['Soltero/a', 'Casado/a', 'Divorciado/a', 'Viudo/a', 'Otro'];
   const validGenders = ['Masculino', 'Femenino', 'No binario', 'Otro'];
   const roles = [
@@ -200,6 +212,9 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
       address: item.address,
       email: item.email,
       phone: item.phone,
+      placeWork: item.placeWork || '',
+      phoneWork: item.phoneWork || '',
+      job: item.job || '',
     });
     openModal();
   };
@@ -219,6 +234,9 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
       address: '',
       email: '',
       phone: '',
+      placeWork: '',
+      phoneWork: '',
+      job: '',
     });
   };
 
@@ -248,6 +266,10 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
       setMessageVerification(data.verificationMessage);
       fetchItems();
       closeModal();
+    }
+    else if (data.renewalMessage) {
+      setMessageVerification(data.renewalMessage);
+      await fetchItems();
     }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
@@ -299,6 +321,10 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
   const [sortDirection, setSortDirection] = useState('asc');
   const [sortProperty, setSortProperty] = useState('userID');
 
+  const [searchType2, setSearchType2] = useState('birthday');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
   const getCurrentPageItems = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -306,18 +332,20 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
     // Filtrar y ordenar los elementos según término de búsqueda y tipo de búsqueda seleccionado
     const filteredItems = filterItems(items, searchTerm, searchType);
 
+    const itemsInDateRange = filterItemsByDateRange(filteredItems, startDate, endDate, searchType2);
+
     // Ordenar los elementos según la dirección de ordenamiento y la propiedad seleccionada
-    const sortedItems = sortItems(filteredItems, sortProperty, sortDirection);
+    const sortedItems = sortItems(itemsInDateRange, sortProperty, sortDirection);
     return sortedItems.slice(startIndex, endIndex);
   };
 
   const getNumberFiltered = () => {
     const filteredItems = filterItems(items, searchTerm, searchType);
-    return filteredItems.length;
+    const itemsInDateRange = filterItemsByDateRange(filteredItems, startDate, endDate, searchType2);
+    return itemsInDateRange.length;
   }
 
   // -------------------------------Funciones de Extra-------------------------------
-
   const isMounted = useRef(false);
   useEffect(() => {
     if (!isMounted.current) {
@@ -430,20 +458,50 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
             inputId='birthday'
             value={newItem.birthday}
             onChange={(e) => setNewItem({ ...newItem, birthday: e.target.value })}
-            placeholder={`Ingresar Fecha de Cumpleaños`}
+            placeholder={`Ingresar Fecha de Nacimiento`}
           />
           <TextInput
-            inputId='address'
-            value={newItem.address}
-            onChange={(e) => setNewItem({ ...newItem, address: e.target.value })}
-            placeholder={`Ingresar Dirección`}
+            inputId='job'
+            value={newItem.job}
+            onChange={(e) => setNewItem({ ...newItem, job: e.target.value })}
+            placeholder={`Ingresar Cargo de Trabajo`}
           />
-          <TextInput
-            inputId='phone'
-            value={newItem.phone}
-            onChange={(e) => setNewItem({ ...newItem, phone: e.target.value })}
-            placeholder={`Ingresar Telefono`}
-          />
+          <div className='flex gap-1 sm:gap-2'>
+            <div className='flex-1'>
+              <TextInput
+                inputId='address'
+                value={newItem.address}
+                onChange={(e) => setNewItem({ ...newItem, address: e.target.value })}
+                placeholder={`Ingresar Dirección`}
+              />
+            </div>
+            <div className='flex-1'>
+              <TextInput
+                inputId='placeWork'
+                value={newItem.placeWork}
+                onChange={(e) => setNewItem({ ...newItem, placeWork: e.target.value })}
+                placeholder={`Ingresar Lugar de Trabajo`}
+              />
+            </div>
+          </div>
+          <div className='flex gap-1 sm:gap-2'>
+            <div className='flex-1'>
+              <TextInput
+                inputId='phone'
+                value={newItem.phone}
+                onChange={(e) => setNewItem({ ...newItem, phone: e.target.value })}
+                placeholder={`Ingresar Teléfono`}
+              />
+            </div>
+            <div className='flex-1'>
+              <TextInput
+                inputId='phoneWork'
+                value={newItem.phoneWork}
+                onChange={(e) => setNewItem({ ...newItem, phoneWork: e.target.value })}
+                placeholder={`Ingresar Teléfono del Trabajo`}
+              />
+            </div>
+          </div>
         </FormContainer>
       </ModalCRUD>
 
@@ -466,6 +524,8 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
           options={options}
         />
 
+        <DateRangeSearch startDate={startDate} endDate={endDate} setStartDate={setStartDate} setEndDate={setEndDate} searchType2={searchType2} setSearchType2={setSearchType2} options2={options2} />
+        
         {items.length !== 0 && (
           <div className='my-2 flex flex-col items-center gap-1 sm:gap-2 sm:flex-row sm:justify-center'>
             <div className='flex-1 w-full'>
@@ -482,7 +542,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
             <div className='flex-1 w-full'>
               <ImportCRUD
                 name={name}
-                label={`${name}s`}
+                label={'Estudiantes'}
                 url={urls[4]}
                 handleFetchItems={fetchItems}
               />
@@ -544,6 +604,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
                   </td>
                   <td className='px-4 py-2'>{item.userID}</td>
                   <td className='px-4 py-2'>{item.rut}</td>
+                  <td className='px-4 py-2'>{item.email}</td>
                   <td className='px-4 py-2'>{item.firstName}</td>
                   <td className='px-4 py-2'>{item.secondName}</td>
                   <td className='px-4 py-2'>{item.surnameM}</td>
@@ -552,8 +613,10 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
                   <td className='px-4 py-2'>{item.stateCivil}</td>
                   <td className='px-4 py-2'>{item.birthday}</td>
                   <td className='px-4 py-2'>{item.address}</td>
-                  <td className='px-4 py-2'>{item.email}</td>
+                  <td className='px-4 py-2'>{item.placeWork}</td>
                   <td className='px-4 py-2'>{item.phone}</td>
+                  <td className='px-4 py-2'>{item.phoneWork}</td>
+                  <td className='px-4 py-2'>{item.job}</td>
                   <td className='px-4 py-2'>{item.entry}</td>
                   <td className="whitespace-nowrap px-4 py-2 font-medium">
                     {getFormattedRoles(item.roles).map((role, index) => (
@@ -564,7 +627,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
                             ? 'bg-blue-200 text-blue-800'
                             : role === 'Encargado'
                               ? 'bg-green-200 text-green-800'
-                              : role === 'Academico'
+                              : role === 'Académico'
                                 ? 'bg-yellow-200 text-yellow-800'
                                 : role === 'Estudiante'
                                   ? 'bg-sky-200 text-sky-800'

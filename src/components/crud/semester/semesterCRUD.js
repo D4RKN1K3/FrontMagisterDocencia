@@ -206,6 +206,10 @@ const SemesterCRUD = ({ name, urls, title, subtitle }) => {
       fetchItems();
       closeModal();
     }
+    else if (data.renewalMessage) {
+      setMessageVerification(data.renewalMessage);
+      await fetchItems();
+    }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
       deniedSession(navigate);
@@ -362,7 +366,7 @@ const SemesterCRUD = ({ name, urls, title, subtitle }) => {
       {messageVerification && (<AlertVerification message={messageVerification} onClose={closeAlert} />)}
 
       <ModalCRUD isOpen={ModalOpen}>
-        <FormContainer updateId={updateId} itemName={itemName} pText={''} handleSubmit={handleSubmit} closeModal={closeModal}>
+        <FormContainer updateId={updateId} itemName={itemName} pText={'Se recomienda crear solo el semestre actual, ya que este será procesado por todos los usuarios.'} handleSubmit={handleSubmit} closeModal={closeModal}>
           <TextInput
             inputId='yearSemester'
             value={newItem.year}

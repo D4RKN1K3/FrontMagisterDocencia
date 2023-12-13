@@ -1,7 +1,6 @@
 import React from 'react';
 import FormHeaderNotUpdate from '../header/formHeaderNotUpdate';
 import FormButtonsNotUpdate from '../../button/form/formButtonsNotUpdate'
-import '../../../style/border.css'
 
 const FormContainerNotUpdate = ({
   message,
@@ -15,7 +14,6 @@ const FormContainerNotUpdate = ({
 }) => {
   return (
     <div className="mx-auto max-w-screen items-center w-80 sm:w-full"
-      id="borderimg1"
     >
       <form
         onSubmit={handleSubmit}

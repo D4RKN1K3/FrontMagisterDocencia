@@ -64,6 +64,10 @@ const ImportCRUD = ({ name, label, url, handleFetchItems }) => {
       setModalOpen(false);
       await handleFetchItems();
     }
+    else if (data.renewalMessage) {
+      await handleFetchItems();
+      setMessageVerification(data.renewalMessage);
+    }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
       deniedSession(navigate);

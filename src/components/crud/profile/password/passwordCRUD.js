@@ -80,6 +80,9 @@ const PasswordCRUD = ({ urls }) => {
       setMessageVerification(data.verificationMessage);
       closeModal();
     }
+    else if (data.renewalMessage) {
+      setMessageVerification(data.renewalMessage);
+    }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
       deniedSession(navigate);

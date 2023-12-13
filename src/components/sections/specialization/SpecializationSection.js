@@ -164,7 +164,7 @@ const SpecializationSection = ({ items, semester, selectedItems, handleDeleteSel
                                         <Link
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            to={`/${item.userID}`}
+                                            to={`FirstStage/${item.specializationHasUserID}`}
                                         >
                                             <CustomButton
                                                 type="button"
@@ -182,12 +182,12 @@ const SpecializationSection = ({ items, semester, selectedItems, handleDeleteSel
                                             </CustomButton>
                                         </Link>
                                     </div>
-                                    {(item.evaluationStatusID >= 7) && (
+                                    {(item.evaluationStatusID >= 7 || item.evaluationStatusID === 4) && (
                                             <div className='flex-1'>
                                                 <Link
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    to={`/${item.userID}`}
+                                                    to={`SecondStage/${item.specializationHasUserID}`}
                                                 >
                                                     <CustomButton
                                                         type="button"

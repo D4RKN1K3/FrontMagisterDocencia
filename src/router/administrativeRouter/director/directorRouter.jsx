@@ -17,7 +17,7 @@ const DirectorRouter = () => {
         <Route path="Users" element={<Users />} />
         <Route path="Academic" element={<Academic />} />
         <Route path="Student" element={<Student />} />
-        <Route path="Document/:roleHasUserID" element={<Document />} />
+        <Route path="Document/:userID" element={<Document />} />
         <Route path="HandleTitle/:userID" element={<HandleTitle />} />
         <Route path="Title" element={<Title />} />
         <Route path="Semester" element={<Semester />} />

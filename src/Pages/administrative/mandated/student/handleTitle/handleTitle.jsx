@@ -1,14 +1,14 @@
 import React from "react";
-import RoleHasTitleCRUD from "../../../../../components/crud/handleTitle/roleHasTitleCRUD";
+import UserHasTitleCRUD from "../../../../../components/crud/handleTitle/userHasTitleCRUD";
 
 export const HandleTitle = () => {
     const myUrls = [
-        process.env.REACT_APP_MIDDLEWARE_URL_BASE + '/role/mandated/handleTitle/roleHasTitle',
-        process.env.REACT_APP_MIDDLEWARE_URL_BASE + '/role/mandated/handleTitle/roleHasTitle/title',
+        process.env.REACT_APP_MIDDLEWARE_URL_BASE + '/role/mandated/handleTitle/userHasTitle',
+        process.env.REACT_APP_MIDDLEWARE_URL_BASE + '/role/mandated/handleTitle/userHasTitle/title',
     ];
 
 
     return (
-        <RoleHasTitleCRUD name={'Titulación'} urls={myUrls} title={`Bienvenido a gestión de titulación`} subtitle={'CRUD de Titulación'} />
+        <UserHasTitleCRUD name={'Titulación'} urls={myUrls} title={`Bienvenido a gestión de titulación`} subtitle={'CRUD de Titulación'} />
     )
 }

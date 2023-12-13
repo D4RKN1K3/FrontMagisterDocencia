@@ -120,6 +120,9 @@ const RoleCRUD = ({ rolesString, rolesIdString, name, urls, userID, handleFetchI
       setModalOpen(false);
       await handleFetchItems();
     }
+    else if (data.renewalMessage) {
+      await handleFetchItems();
+    }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
       deniedSession(navigate);

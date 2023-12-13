@@ -29,7 +29,7 @@ const ModalCRUD = ({ isOpen, children }) => {
 
   return (
     <div className={`fixed inset-0 z-40 flex items-center justify-center overflow-x-hidden bg-zinc-900/70 outline-none focus:outline-none`}>
-      <div className={`ml-20 mr-4 bg-white p-0 rounded-lg shadow-md ${shouldAnimate ? 'animate-bounce' : ''}`}>
+      <div className={`ml-20 mr-4 bg-white p-0 rounded-xl shadow-md ${shouldAnimate ? 'animate-bounce' : ''}`}>
         {children}
       </div>
     </div>

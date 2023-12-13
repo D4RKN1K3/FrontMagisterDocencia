@@ -10,11 +10,12 @@ import IconOnlyAlert from '../../alert/iconOnlyAlert'
 import CustomButton from '../../button/customButton';
 
 import { GETRequest, POSTRequest, PUTRequest, DELETERequest } from '../../../utils/requestHelpers';
-import { filterItems, sortItems } from '../../../utils/crudHelpers/searchFilter';
+import { filterItems, sortItems, filterItemsByDateRange } from '../../../utils/crudHelpers/searchFilter';
 import { renewSession, deniedSession } from '../../../utils/sessionHelpers';
 import ItemListHeader from '../../forms/header/itemListHeader';
 import SearchWithSelect from '../../search/searchWithSelect';
 import SortButton from '../../sort/sortButton';
+import DateRangeSearch from '../../search/dateRangeSearch';
 import PaginationButtons from '../../button/table/paginationButtons';
 import FormContainer from '../../forms/body/formContainer';
 import Checkbox from '../../input/checkbox';
@@ -42,6 +43,9 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
     phone: '',
     entry: '',
     id: '',
+    placeWork: '',
+    phoneWork: '',
+    job: '',
   });
 
   const options = [
@@ -53,12 +57,17 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
     { label: `Segundo Apellido`, value: 'surnameF' },
     { label: `Sexo`, value: 'sex' },
     { label: `Estado Civil`, value: 'stateCivil' },
-    { label: `Fecha de Cumpleaños`, value: 'birthday' },
+    { label: `Fecha de Nacimiento`, value: 'birthday' },
     { label: `Direccion`, value: 'address' },
     { label: `Email del ${itemName}`, value: 'email' },
     { label: `Telefono del ${itemName}`, value: 'phone' },
     { label: `Fecha de Creacion`, value: 'entry' },
   ];
+  const options2 = [
+    { label: `Fecha de Nacimiento`, value: 'birthday' },
+    { label: `Fecha de Creacion`, value: 'entry' },
+  ];
+
   const validMaritalStatuses = ['Soltero/a', 'Casado/a', 'Divorciado/a', 'Viudo/a', 'Otro'];
   const validGenders = ['Masculino', 'Femenino', 'No binario', 'Otro'];
 
@@ -186,6 +195,9 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
       address: item.address,
       email: item.email,
       phone: item.phone,
+      placeWork: item.placeWork || '',
+      phoneWork: item.phoneWork || '',
+      job: item.job || '',
     });
     openModal();
   };
@@ -204,6 +216,9 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
       address: '',
       email: '',
       phone: '',
+      placeWork: '',
+      phoneWork: '',
+      job: '',
     });
   };
 
@@ -233,6 +248,10 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
       setMessageVerification(data.verificationMessage);
       fetchItems();
       closeModal();
+    }
+    else if (data.renewalMessage) {
+      setMessageVerification(data.renewalMessage);
+      await fetchItems();
     }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
@@ -284,6 +303,10 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
   const [sortDirection, setSortDirection] = useState('asc');
   const [sortProperty, setSortProperty] = useState('userID');
 
+  const [searchType2, setSearchType2] = useState('birthday');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
   const getCurrentPageItems = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -291,8 +314,10 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
     // Filtrar y ordenar los elementos según término de búsqueda y tipo de búsqueda seleccionado
     const filteredItems = filterItems(items, searchTerm, searchType);
 
+    const itemsInDateRange = filterItemsByDateRange(filteredItems, startDate, endDate, searchType2);
+
     // Ordenar los elementos según la dirección de ordenamiento y la propiedad seleccionada
-    const sortedItems = sortItems(filteredItems, sortProperty, sortDirection);
+    const sortedItems = sortItems(itemsInDateRange, sortProperty, sortDirection);
     return sortedItems.slice(startIndex, endIndex);
   };
 
@@ -403,7 +428,7 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
             inputId='birthday'
             value={newItem.birthday}
             onChange={(e) => setNewItem({ ...newItem, birthday: e.target.value })}
-            placeholder={`Ingresar Fecha de Cumpleaños`}
+            placeholder={`Ingresar Fecha de Nacimiento`}
           />
           <TextInput
             inputId='address'
@@ -438,6 +463,9 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
           setSearchType={setSearchType}
           options={options}
         />
+
+        <DateRangeSearch startDate={startDate} endDate={endDate} setStartDate={setStartDate} setEndDate={setEndDate} searchType2={searchType2} setSearchType2={setSearchType2} options2={options2} />
+
 
         {items.length !== 0 && (
           <div className='my-2 flex flex-col items-center gap-1 sm:gap-2 sm:flex-row sm:justify-center'>

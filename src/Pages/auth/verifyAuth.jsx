@@ -3,7 +3,6 @@ import Loader from '../../components/loader/Loader';
 import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
 import { getSession, deniedSession } from '../../utils/sessionHelpers';
-
 import { POSTRequest } from '../../utils/requestHelpers';
 
 
