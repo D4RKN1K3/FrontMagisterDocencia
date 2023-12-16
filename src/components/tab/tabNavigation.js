@@ -38,7 +38,7 @@ const PaginationTabButtons = ({
     const length = items.length;
     const totalPages = Math.ceil(length / itemsPerPage);
 
-    const maxVisiblePages = window.innerWidth < 500 ? 1 : 5;
+    const maxVisiblePages = window.innerWidth < 500 ? 1 : 4;
     const pagesArray = useMemo(() => {
         const visiblePages = Math.min(totalPages, maxVisiblePages);
 
@@ -79,7 +79,7 @@ const PaginationTabButtons = ({
                 <div className="space-x-1">
                     <button
                         onClick={() => handlePageDefaultChange()}
-                        className={`inline-flex items-center justify-center w-auto h-8 p-2 border rounded-md shadow ${currentTab === 0
+                        className={`inline-flex text-xs sm:text-sm items-center justify-center w-auto h-8 p-2 border rounded-md shadow ${currentTab === 0
                             ? 'bg-orange-500 text-white'
                             : 'hover:bg-white hover:border-orange-500 hover:text-orange-500'
                             }`}

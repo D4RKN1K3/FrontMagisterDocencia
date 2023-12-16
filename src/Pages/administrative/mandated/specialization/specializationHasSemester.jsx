@@ -3,11 +3,11 @@ import SpecializationHasSemesterCRUD from '../../../../components/crud/specializ
 
 export const SpecializationHasSemester = () => {
   const myUrls = [
-    process.env.REACT_APP_MIDDLEWARE_URL_BASE + '/role/mandated/specialization/',
-    process.env.REACT_APP_MIDDLEWARE_URL_BASE + '/role/mandated/specialization/academic',
-    process.env.REACT_APP_MIDDLEWARE_URL_BASE + '/role/mandated/specialization/semester',
+    'http://localhost:3000' + '/role/mandated/specialization/',
+    'http://localhost:3000' + '/role/mandated/specialization/academic',
+    'http://localhost:3000' + '/role/mandated/specialization/semester',
   ];
   return (
-    <SpecializationHasSemesterCRUD name={'Semestre'} urls={myUrls} title={`Bienvenido a la Asignación de Academícos`} subtitle={''} />
+    <SpecializationHasSemesterCRUD name={'Asignación de Académicos'} urls={myUrls} title={`Bienvenido a la Asignación de Académicos`} subtitle={''} />
   );
 };

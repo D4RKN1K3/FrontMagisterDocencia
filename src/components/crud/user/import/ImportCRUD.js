@@ -77,9 +77,9 @@ const ImportCRUD = ({ name, label, url, handleFetchItems }) => {
       OptionMessage(renewedData);
     }
     else if (data.message) {
-      if (data.message.error.message) {
+      if (data.message.error && data.message.error.message !== undefined) {
         setMessageError(data.message.error.message);
-        return
+        return;
       }
       setMessageError(data.message);
     }

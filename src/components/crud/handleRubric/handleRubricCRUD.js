@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { PDFViewer } from '@react-pdf/renderer';
 
 import ModalCRUD from '../../modal/modalCRUD';
@@ -183,9 +183,9 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
       OptionMessage(renewedData);
     }
     else if (data.message) {
-      if (data.message.error.message !== undefined) {
+      if (data.message.error && data.message.error.message !== undefined) {
         setMessageError(data.message.error.message);
-        return
+        return;
       }
       setMessageError(data.message);
     }
@@ -254,9 +254,9 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
       OptionMessage(renewedData);
     }
     else if (data.message) {
-      if (data.message.error.message !== undefined) {
+      if (data.message.error && data.message.error.message !== undefined) {
         setMessageError(data.message.error.message);
-        return
+        return;
       }
       setMessageError(data.message);
     }

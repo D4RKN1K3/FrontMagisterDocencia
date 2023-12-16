@@ -2,27 +2,32 @@ import React, { useState, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
 import { useNavigate, useParams } from "react-router-dom";
 
-import ModalCRUD from '../../../../modal/modalCRUD';
-import Alert from '../../../../alert/alert';
-import AlertVerification from '../../../../alert/alertVerification';
-import WaitingAlert from '../../../../alert/waitingAlert';
-import IconOnlyAlert from '../../../../alert/iconOnlyAlert'
+import ModalCRUD from '../../../modal/modalCRUD';
+import Alert from '../../../alert/alert';
+import AlertVerification from '../../../alert/alertVerification';
+import WaitingAlert from '../../../alert/waitingAlert';
+import IconOnlyAlert from '../../../alert/iconOnlyAlert'
 
-import { GETRequest, POSTFileRequest, PUTFileRequest } from '../../../../../utils/requestHelpers';
-import { sortItems } from '../../../../../utils/crudHelpers/searchFilter';
-import { renewSession, deniedSession } from '../../../../../utils/sessionHelpers';
-import ItemListHeaderStage from '../../../../forms/header/itemListHeaderStage';
-import PaginationButtons from '../../../../button/table/paginationButtons';
-import FormContainer from '../../../../forms/body/formContainer';
-import FileDropzone from '../../../../input/fileDropzone';
-import TableStage from '../../../../table/tableStage';
+import { GETRequest, POSTFileRequest, PUTFileRequest } from '../../../../utils/requestHelpers';
+import { sortItems } from '../../../../utils/crudHelpers/searchFilter';
+import { renewSession, deniedSession } from '../../../../utils/sessionHelpers';
+import ItemListHeaderStage from '../../../forms/header/itemListHeaderStage';
+import PaginationButtons from '../../../button/table/paginationButtons';
+import FormContainer from '../../../forms/body/formContainer';
+import FileDropzone from '../../../input/fileDropzone';
+import TableStage from '../../../table/tableStage';
+import ModalFile from '../../../modal/modalFile';
+import { PDFViewer } from '@react-pdf/renderer';
+import ExportPDF from '../../handleRubric/exportPDF/exportPDF';
 
-const StageCRUD = ({ name, urls, title, subtitle }) => {
+const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
-  const { specializationHasUserID } = useParams();
+  const { stageID, specializationHasUserID, specializationHasSemesterID } = useParams();
 
   const [items, setItems] = useState([]);
+  const [specializationHasStudent, setspecializationHasStudent] = useState([]);
+  const [rubricHasQuestion, setRubricHasQuestion] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
 
   const [updateId, setUpdateId] = useState(null);
@@ -31,19 +36,46 @@ const StageCRUD = ({ name, urls, title, subtitle }) => {
   const ITEMS_PER_PAGE = parseInt(process.env.REACT_APP_ITEMS_PER_PAGE, 10);
 
   // -------------------------------Funciones Para CRUD-------------------------------
-  const fetchItems = async () => {
+  const fetchItems = async (nameSelect, url, params) => {
     try {
-      const url = urls[0];
       const access_token = Cookies.get('access_token');
+      if (access_token) {
+        setMessageWaiting(true);
+        const config = {
+          ...params,
+          access_token,
+        };
+        const response = await GETRequest(url, config);
+        OptionMessage(response, nameSelect);
+      } else {
+        setMessageError('No tienes una session');
+      }
+    } catch (error) {
+      setMessageWaiting(false);
+      setMessageError(`Error seaching ${itemName}:` + error.message);
+    }
+  };
+
+  const fetchRubric = async (evaluateID, academicID) => {
+    if (!academicID){
+      setMessageError('No tiene Académicos Asignados');
+      return;
+    }
+    try {
+      const access_token = Cookies.get('access_token');
+      const url = urls[2];
       if (access_token) {
         setMessageWaiting(true);
         const config = {
           access_token,
           specializationHasUserID,
+          stageID,
+          specializationHasSemesterID,
+          evaluateID,
+          academicID, 
         };
-
         const response = await GETRequest(url, config);
-        OptionMessage(response);
+        OptionMessage(response, 'rubricHasQuestion');
       } else {
         setMessageError('No tienes una session');
       }
@@ -68,6 +100,8 @@ const StageCRUD = ({ name, urls, title, subtitle }) => {
           const config = {
             access_token,
             specializationHasUserID,
+            stageID,
+            specializationHasSemesterID,
           };
           const response = await POSTFileRequest(url, config, selectedFile);
           OptionMessage(response);
@@ -97,6 +131,8 @@ const StageCRUD = ({ name, urls, title, subtitle }) => {
             access_token,
             evaluateID: updateId,
             specializationHasUserID,
+            stageID,
+            specializationHasSemesterID,
           };
           const response = await PUTFileRequest(url, config, selectedFile);
           OptionMessage(response);
@@ -132,16 +168,31 @@ const StageCRUD = ({ name, urls, title, subtitle }) => {
     setSelectedFile(null);
   };
 
-  const OptionMessage = async (data) => {
+  const OptionMessage = async (data, nameSelect) => {
     setMessageWaiting(false);
     if (data.verificationMessage) {
       setMessageVerification(data.verificationMessage);
-      fetchItems();
+      await fetchItems('items', urls[0],
+        {
+          specializationHasUserID,
+          stageID,
+          specializationHasSemesterID,
+        });
       closeModal();
     }
     else if (data.renewalMessage) {
       setMessageVerification(data.renewalMessage);
-      await fetchItems();
+      await fetchItems('items', urls[0],
+        {
+          specializationHasUserID,
+          stageID,
+          specializationHasSemesterID,
+        });
+      await fetchItems('specializationHasStudent', urls[1],
+        {
+          specializationHasSemesterID,
+          specializationHasUserID
+        });
     }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
@@ -152,9 +203,9 @@ const StageCRUD = ({ name, urls, title, subtitle }) => {
       OptionMessage(renewedData);
     }
     else if (data.message) {
-      if (data.message.error.message !== undefined) {
+      if (data.message.error && data.message.error.message !== undefined) {
         setMessageError(data.message.error.message);
-        return
+        return;
       }
       setMessageError(data.message);
     }
@@ -178,6 +229,13 @@ const StageCRUD = ({ name, urls, title, subtitle }) => {
       }
     }
     else if (data) {
+      if (nameSelect === 'specializationHasStudent') {
+        setspecializationHasStudent(data);
+      } else if (nameSelect === 'rubricHasQuestion'){
+        const sortedItems = sortItems(data, 'questionID', 'asc');
+        setRubricHasQuestion(sortedItems);
+        openModalFile();
+      }
       setItems(data);
     }
     else {
@@ -193,21 +251,28 @@ const StageCRUD = ({ name, urls, title, subtitle }) => {
   const getCurrentPageItems = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-
     // Ordenar los elementos según la dirección de ordenamiento y la propiedad seleccionada
     const sortedItems = sortItems(items, sortProperty, sortDirection);
     return sortedItems.slice(startIndex, endIndex);
   };
-
   // -------------------------------Funciones de Extra-------------------------------
-
   const isMounted = useRef(false);
   useEffect(() => {
-    if (specializationHasUserID) {
+    if (specializationHasUserID && specializationHasSemesterID && stageID) {
       if (!isMounted.current) {
         isMounted.current = true;
         // Coloca el código que deseas ejecutar solo una vez aquí
-        fetchItems();
+        fetchItems('items', urls[0],
+          {
+            specializationHasUserID,
+            stageID,
+            specializationHasSemesterID,
+          });
+        fetchItems('specializationHasStudent', urls[1],
+          {
+            specializationHasSemesterID,
+            specializationHasUserID
+          });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -233,6 +298,15 @@ const StageCRUD = ({ name, urls, title, subtitle }) => {
     clearItem();
   };
 
+  const [ModalOpenFile, setModalOpenFile] = useState(false);
+
+  const openModalFile = () => {
+    setModalOpenFile(true);
+  };
+  const closeModalFile = () => {
+    setModalOpenFile(false);
+  };
+
   return (
     <div>
       {messageWaiting && <WaitingAlert />}
@@ -242,18 +316,26 @@ const StageCRUD = ({ name, urls, title, subtitle }) => {
       <ModalCRUD isOpen={ModalOpen}>
         <FormContainer
           updateId={updateId}
-          itemName={itemName}
+          itemName={`${specializationHasStudent.typeEvaluateName}`}
           pText={''}
           handleSubmit={handleSubmit}
           closeModal={closeModal}
-          createMessage={'Subir Anteproyecto'}
+          createMessage={`Subir ${specializationHasStudent.typeEvaluateName}`}
           create2Message={'Proceso de Evaluación'}
-          updateMessage={'Cambiar Anteproyecto'}
+          updateMessage={`Modificar ${specializationHasStudent.typeEvaluateName}`}
           update2Message={'Proceso de Evaluación'}
         >
           <FileDropzone onFileChange={handleFileChange} />
         </FormContainer>
       </ModalCRUD>
+
+      <ModalFile isOpen={ModalOpenFile} onClose={closeModalFile}>
+        <div className="w-full h-screen">
+          <PDFViewer width="100%" height="100%">
+            <ExportPDF rubricHasQuestion={rubricHasQuestion} />
+          </PDFViewer>
+        </div>
+      </ModalFile>
 
       <div className='min-h-screen mx-2 my-2'>
         <ItemListHeaderStage
@@ -265,10 +347,10 @@ const StageCRUD = ({ name, urls, title, subtitle }) => {
 
         <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={items.length} />
 
-        <TableStage items={getCurrentPageItems()} handleEdit={handleEdit} />
+        <TableStage items={getCurrentPageItems()} specializationHasStudent={specializationHasStudent} handleEdit={handleEdit} fetchRubric={fetchRubric}/>
       </div>
     </div >
   );
 };
 
-export default StageCRUD;
+export default EvaluateCRUD;

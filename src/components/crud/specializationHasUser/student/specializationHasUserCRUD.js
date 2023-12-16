@@ -12,9 +12,9 @@ import { renewSession, deniedSession } from '../../../../utils/sessionHelpers';
 import SearchWithSelect from '../../../search/searchWithSelect';
 import PaginationButtons from '../../../button/table/paginationButtons';
 import SearchSelect from '../../../input/searchSelect';
-import SpecializationSection from '../../../sections/specialization/SpecializationSection';
+import SpecializationSection from '../../../sections/specialization/specializationSection';
 
-const SpecializationHasUserCRUD = ({ name, urls, title, subtitle }) => {
+const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
 
@@ -26,14 +26,12 @@ const SpecializationHasUserCRUD = ({ name, urls, title, subtitle }) => {
   });
 
   const options = [
-    { label: `Nombre de la ${itemName}`, value: 'name' },
-    { label: `Fecha de Inicio`, value: 'startDate' },
-    { label: `Fecha de Finalización`, value: 'finishDate' },
-    { label: `Tipo de Semestre`, value: 'semesterNumber' },
-    { label: `Año del Semestre`, value: 'year' },
-    { label: `Nombre Completo del Primer Academíco`, value: 'academic1_fullName' },
-    { label: `Nombre Completo del Segundo Academíco`, value: 'academic2_fullName' },
-    { label: `Nombre Completo del Tercer Academíco`, value: 'academic3_fullName' },
+    { label: `Nombre de la ${itemName}`, value: 'specialization.name' },
+    { label: `Descripcion del Estado`, value: 'status.name' },
+    { label: `Numero del Semestre de Ingreso`, value: 'entrySemester.semesterNumber' },
+    { label: `Año de Ingreso`, value: 'entrySemester.year' },
+    { label: `Numero del Semestre de Finalización`, value: 'completionSemester.semesterNumber' },
+    { label: `Año de Finalización`, value: 'completionSemester.year' },
   ];
 
   const [updateId, setUpdateId] = useState(null);
@@ -149,6 +147,7 @@ const SpecializationHasUserCRUD = ({ name, urls, title, subtitle }) => {
     setUpdateId(item.specializationHasUserID);
     setNewItem({
       specializationID: item.specializationID,
+      semesterID: item.entrySemester.semesterID,
     });
   };
 
@@ -156,6 +155,7 @@ const SpecializationHasUserCRUD = ({ name, urls, title, subtitle }) => {
     setUpdateId(null);
     setNewItem({
       specializationID: '',
+      semesterID: '',
     });
   };
 
@@ -195,9 +195,9 @@ const SpecializationHasUserCRUD = ({ name, urls, title, subtitle }) => {
       OptionMessage(renewedData);
     }
     else if (data.message) {
-      if (data.message.error.message !== undefined) {
+      if (data.message.error && data.message.error.message !== undefined) {
         setMessageError(data.message.error.message);
-        return
+        return;
       }
       setMessageError(data.message);
     }
@@ -267,9 +267,9 @@ const SpecializationHasUserCRUD = ({ name, urls, title, subtitle }) => {
       OptionMessage(renewedData);
     }
     else if (data.message) {
-      if (data.message.error.message !== undefined) {
+      if (data.message.error && data.message.error.message !== undefined) {
         setMessageError(data.message.error.message);
-        return
+        return;
       }
       setMessageError(data.message);
     }
@@ -303,10 +303,11 @@ const SpecializationHasUserCRUD = ({ name, urls, title, subtitle }) => {
       }
       else if (nameSelect === 'semester') {
         const sortedItems = sortItems(data, 'finishDate', 'desc');
-        setNewItem({
-          semesterID: sortedItems[0].semesterID,
-        });
-        setSemester(sortedItems[0]);
+        const format = sortedItems.map(item => ({
+          value: item.semesterID,
+          label: `${item.year} - ${item.semesterNumber === 1 ? 'Primer' : 'Segundo'} Semestre`
+        }));        
+        setSemester(format);
       }
     }
     else {
@@ -382,7 +383,14 @@ const SpecializationHasUserCRUD = ({ name, urls, title, subtitle }) => {
 
         <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
 
-        <SpecializationSection updateId={updateId} itemName={itemName} items={getCurrentPageItems()} semester={semester} selectedItems={selectedItems} handleDeleteSelected={handleDeleteSelected} handleCheckboxChange={handleCheckboxChange} handleEdit={handleEdit} handleSubmit={handleSubmit} closeModal={closeModal}>
+        <SpecializationSection updateId={updateId} itemName={itemName} items={getCurrentPageItems()} selectedItems={selectedItems} handleDeleteSelected={handleDeleteSelected} handleCheckboxChange={handleCheckboxChange} handleEdit={handleEdit} handleSubmit={handleSubmit} closeModal={closeModal}>
+          <SearchSelect
+            selectId='semesterID'
+            placeholder="Seleccione semestre de ingreso"
+            options={semester}
+            value={newItem.semesterID}
+            onChange={(selectedOption) => setNewItem({ ...newItem, semesterID: selectedOption.value })}
+          />
           <SearchSelect
             selectId='specializationID'
             placeholder="Seleccione Especialización"
@@ -396,4 +404,4 @@ const SpecializationHasUserCRUD = ({ name, urls, title, subtitle }) => {
   );
 };
 
-export default SpecializationHasUserCRUD;
+export default SpecializationHasSemesterCRUD;
