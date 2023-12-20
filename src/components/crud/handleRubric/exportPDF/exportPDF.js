@@ -1,8 +1,8 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
-const ExportPDF = ({ rubricHasQuestion }) => {
-
-  if (!rubricHasQuestion) {
+const ExportPDF = ({ rubricHasQuestion, academicName }) => {
+  console.log(rubricHasQuestion)
+  if (!Array.isArray(rubricHasQuestion) || !rubricHasQuestion) {
     return null;
   }
 
@@ -44,7 +44,13 @@ const ExportPDF = ({ rubricHasQuestion }) => {
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.section}>
-          <Text>Rubrica</Text>
+          <Text>Nombre de la Rubrica: {rubricHasQuestion[0].rubricName}</Text>
+          <Text>Description: {rubricHasQuestion[0].description}</Text>
+          <Text>Comentario: {rubricHasQuestion[0].comment}</Text>
+          <Text>Estado de la Rubrica: {rubricHasQuestion[0].statusName}</Text>
+          {(academicName) &&
+            <Text>Nombre Completo del Academico: {academicName}</Text>
+          }
           <View style={styles.headerRow}>
             <Text style={[styles.headerCell, styles.questionCell, styles.cellText]}>Pregunta</Text>
             <Text style={[styles.headerCell, styles.cell, styles.cellText]}>Excelente</Text>

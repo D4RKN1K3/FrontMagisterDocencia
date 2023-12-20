@@ -25,8 +25,9 @@ import ItemsList from '../../sections/itemsList';
 
 import FileIcon from '../../image/fileIcon';
 import TextInput from '../../input/textInput';
+import DynamicSelect from '../../input/dynamicSelect';
 
-const UserHasTitleCRUD = ({ name, urls, title, subtitle }) => {
+const BodyAcademicCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
   const { userID } = useParams();
@@ -35,17 +36,22 @@ const UserHasTitleCRUD = ({ name, urls, title, subtitle }) => {
   const [newItem, setNewItem] = useState({
     titleID: '',
     titleYear: '',
+    investigationLine: '',
+    typeBond: '',
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
 
   const options = [
     { label: `Identificador de la ${itemName}`, value: 'userHasTitleID' },
-    { label: `Nombre del Título`, value: 'title.name' },
+    { label: `Nombre del Título`, value: 'name' },
     { label: `Año de Obtencion del Título`, value: 'titleYear' },
-    { label: `Formato de la ${itemName}`, value: 'format.name' },
+    { label: `Formato de la ${itemName}`, value: 'formatName' },
   ];
   const [selectTitle, setSelectTitle] = useState([]);
+  const validInvestigationLine = ['Educacio y Humanidad', 'Ingeniería', 'Ciencias', 'Medicina'];
+  const validTypeBond = ['Claustro/núcleo', 'Colaborador'];
+
   const [updateId, setUpdateId] = useState(null);
   const [selectAll, setSelectAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -174,7 +180,10 @@ const UserHasTitleCRUD = ({ name, urls, title, subtitle }) => {
     setUpdateId(item.userHasTitleID);
     setNewItem({
       titleID: item.titleID,
+      bodyAcademicID : item.bodyAcademicID,
       titleYear: item.titleYear,
+      investigationLine: item.investigationLine,
+      typeBond: item.typeBond,
     });
     openModal();
   };
@@ -184,6 +193,8 @@ const UserHasTitleCRUD = ({ name, urls, title, subtitle }) => {
     setNewItem({
       titleID: '',
       titleYear: '',
+      investigationLine: '',
+      typeBond: '',
     });
   };
 
@@ -421,6 +432,10 @@ const UserHasTitleCRUD = ({ name, urls, title, subtitle }) => {
             onChange={(e) => setNewItem({ ...newItem, titleYear: e.target.value })}
             placeholder={`Ingresar Año de Obtencion del Título`}
           />
+          <div className='flex'>
+            <DynamicSelect selectId='investigationLine' label="Seleccione Línea de Investigación" options={validInvestigationLine} value={newItem.investigationLine} onChange={(e) => setNewItem({ ...newItem, investigationLine: e.target.value })} />
+            <DynamicSelect selectId='typeBond' label="Seleccione Tipo de Vinculación" options={validTypeBond} value={newItem.typeBond} onChange={(e) => setNewItem({ ...newItem, typeBond: e.target.value })} />
+          </div>
           {(!updateId) && (
             <FileDropzone onFileChange={handleFileChange} />
           )}
@@ -485,10 +500,10 @@ const UserHasTitleCRUD = ({ name, urls, title, subtitle }) => {
                   />
                 </div>
                 <div className="flex-1 my-2 inline-flex justify-center items-center my-1 md:my-2 gap-2">
-                  <FileIcon format={item.format.name} />
+                  <FileIcon format={item.formatName} />
                 </div>
                 <h4 className="text-xl font-semibold">{item.userHasTitleID}</h4>
-                <p className="text-sm text-gray-700 mb-2">{item.title.name}</p>
+                <p className="text-sm text-gray-700 mb-2">{item.name}</p>
                 <p className="text-sm text-gray-700 mb-2">{item.titleYear}</p>
 
                 <div className="flex flex-col items-center justify-center gap-2">
@@ -541,4 +556,4 @@ const UserHasTitleCRUD = ({ name, urls, title, subtitle }) => {
   );
 };
 
-export default UserHasTitleCRUD;
+export default BodyAcademicCRUD;

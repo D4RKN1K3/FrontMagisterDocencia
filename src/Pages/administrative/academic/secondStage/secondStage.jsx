@@ -1,5 +1,5 @@
 import React from 'react';
-import SpecializationHasSemesterCRUD from '../../../../components/crud/specializationHasUser/academic/specializationHasSemesterCRUD';
+import PreliminaryProjectCRUD from '../../../../components/crud/specializationHasUser/academic/preliminaryProjectCRUD';
 
 export const SecondStage = () => {
   const myUrls = [
@@ -8,6 +8,6 @@ export const SecondStage = () => {
     process.env.REACT_APP_MIDDLEWARE_URL_BASE + '/role/academic/semester',
   ];
   return (
-    <SpecializationHasSemesterCRUD name={'Semestre'} urls={myUrls} title={`Bienvenido a la Asignación de Academícos`} subtitle={''} />
+    <PreliminaryProjectCRUD name={'Semestre'} urls={myUrls} title={`Bienvenido a la Asignación de Academícos`} subtitle={''} stageID={2}/>
   );
 };

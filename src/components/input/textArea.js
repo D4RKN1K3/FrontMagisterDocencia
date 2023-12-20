@@ -14,7 +14,7 @@ const TextArea = ({ inputId, value, onChange, placeholder }) => {
         id={inputId}
         name={inputId}
         value={value || ''}
-        rows="4"
+        rows="2"
         onChange={handleChange}
         className="w-full rounded-lg border-gray-200 align-top shadow-sm sm:text-sm"
         placeholder={placeholder}

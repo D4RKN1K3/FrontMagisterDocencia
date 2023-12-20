@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ActionButtons from '../button/actionButtons';
 import SearchSelect from '../input/searchSelect';
 import Checkbox from '../input/checkbox';
 import CustomButton from '../button/customButton';
@@ -6,7 +7,7 @@ import ModalCRUD from '../modal/modalCRUD';
 import FormContainer from '../forms/body/formContainer';
 import FilterPanel from '../search/filterPanel';
 
-const TableRubric = ({ items, defaultRubricHasQuestion, rubricHasQuestion, setRubricHasQuestion, question, defaultQuestion, handleEdit, handleSaveChanges, handleExportPDF }) => {
+const TableRubric = ({ items, defaultRubricHasQuestion, rubricHasQuestion, setRubricHasQuestion, question, defaultQuestion, fetchItems, handleEditStatus, handleEdit, handleSaveChanges, handleExportPDF }) => {
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
 
@@ -51,7 +52,7 @@ const TableRubric = ({ items, defaultRubricHasQuestion, rubricHasQuestion, setRu
 
         if (isChecked) {
             const selectedRows = rubricHasQuestion
-                .map((question, index) => (question.roleHasUserID !== null ? index : null))
+                .map((question, index) => (question.userID !== null ? index : null))
                 .filter((index) => index !== null);
             setSelectedRows(selectedRows);
         }
@@ -69,7 +70,7 @@ const TableRubric = ({ items, defaultRubricHasQuestion, rubricHasQuestion, setRu
                 good: '-',
                 medium: '-',
                 bad: '-',
-                roleHasUserID: Date.now(),
+                userID: Date.now(),
             },
         ]);
         closeModal();
@@ -132,13 +133,13 @@ const TableRubric = ({ items, defaultRubricHasQuestion, rubricHasQuestion, setRu
             const defaultQuestions = defaultQuestion.map((defaultQ) => ({
                 rubricHasQuestionID: defaultQ.questionID,
                 questionID: defaultQ.questionID,
-                rubricID: '',
+                rubricID: items[0].rubricID,
                 question: defaultQ.question,
                 excellent: '-',
                 good: '-',
                 medium: '-',
                 bad: '-',
-                roleHasUserID: null,
+                userID: null,
             }));
 
             setRubricHasQuestion(defaultQuestions);
@@ -209,6 +210,7 @@ const TableRubric = ({ items, defaultRubricHasQuestion, rubricHasQuestion, setRu
                     />
                 </FormContainer>
             </ModalCRUD>
+
             {!dontShowAgain &&
                 <ModalCRUD isOpen={ModalOpenWarning}>
                     <div className="flex flex-col max-w-lg gap-2 p-6 rounded-md shadow-md bg-white text-orange-400">
@@ -282,16 +284,23 @@ const TableRubric = ({ items, defaultRubricHasQuestion, rubricHasQuestion, setRu
                 </ModalCRUD >
             }
             <section className="bg-white text-orange-400">
-                <div className="container max-w-xl py-2 mx-auto space-y-2 sm:max-w-7xl">
-                    <div>
-                        <h2 className="text-3xl font-bold tracki text-center sm:text-5xl text-orange-400">Aliquip definiebas ad est</h2>
-                        <p className="max-w-3xl mx-auto mt-4 text-xl text-center text-gray-500">Quando cetero his ne, eum admodum sapientem ut.</p>
-                    </div>
+                <div className="container max-w px-2 sm:px-6 py-6 mx-auto rounded-lg shadow-md">
                     {items.map((item) => (
                         <React.Fragment key={item.rubricID}>
-                            <div className="text-center sm:text-start">
-                                <h3 className="text-2xl font-bold tracki sm:text-3xl text-orange-400">{item.rubricName}</h3>
-                                <p className="mt-2 text-lg text-gray-500">{item.description}</p>
+                            <div className="mt-2 flex items-center justify-between">
+                                <span className="text-sm sm:text-lg text-orange-400">
+                                </span>
+                                <div className="px-2 py-1 font-bold rounded bg-orange-500 text-white">
+                                    {item.status.name}
+                                </div>
+                            </div>  
+                            <div className="grid grid-cols-5 items-center justify-between space-y-4 sm:space-y-0">
+                                <div className="text-center sm:text-justify sm:col-span-3 col-span-full">
+                                    <h3 className="text-2xl font-bold tracki sm:text-3xl text-orange-400">{item.rubricName}</h3>
+                                    <p className="mt-2 text-lg text-gray-500">{item.description}</p>
+                                    <p className="mt-1 text-md text-gray-500">{item.comment}</p>
+                                </div>
+                                <ActionButtons handleEvent1={() => handleEdit(item)} handleEvent2={fetchItems} handleEvent3={() => handleEditStatus(item)} message1={'Actualizar Rubrica'} message3={'Actualizar Estado'} />
                             </div>
                             <FilterPanel message={'Administrar Preguntas de la Rubrica'}>
                                 <div className='flex flex-col items-center p-2 gap-1 sm:flex-row sm:justify-center'>
@@ -390,6 +399,7 @@ const TableRubric = ({ items, defaultRubricHasQuestion, rubricHasQuestion, setRu
                                     </div>
                                 </div>
                             </FilterPanel>
+
                             <div className="container mx-auto text-gray-500">
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full text-sm">
@@ -424,7 +434,7 @@ const TableRubric = ({ items, defaultRubricHasQuestion, rubricHasQuestion, setRu
                                             {rubricHasQuestion.map((rubricQuestion, rowIndex) => (
                                                 <tr key={rubricQuestion.rubricHasQuestionID} className="border border-opacity-20 border-gray-700 bg-white">
                                                     <td className="p-3 text-center border border-opacity-20 border-gray-700">
-                                                        {rubricQuestion.roleHasUserID !== null && (
+                                                        {rubricQuestion.userID !== null && (
                                                             <Checkbox
                                                                 id={`delete-${rubricQuestion.rubricHasQuestionID}`}
                                                                 name={`delete-${rubricQuestion.rubricHasQuestionID}`}
@@ -469,7 +479,7 @@ const TableRubric = ({ items, defaultRubricHasQuestion, rubricHasQuestion, setRu
                                                         />
                                                     </td>
                                                     <td className="p-2 text-center border border-opacity-20 border-gray-700">
-                                                        {rubricQuestion.roleHasUserID !== null && (
+                                                        {rubricQuestion.userID !== null && (
                                                             <div className='w-40'>
                                                                 <CustomButton
                                                                     onClick={() => handleEditQuestion(rowIndex, rubricQuestion)} type='button'

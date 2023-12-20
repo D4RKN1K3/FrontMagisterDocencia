@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import Alert from '../../../alert/alert';
 import AlertVerification from '../../../alert/alertVerification';
@@ -19,8 +19,9 @@ import CustomButton from '../../../button/customButton';
 import SortButton from '../../../sort/sortButton';
 import IconOnlyAlert from '../../../alert/iconOnlyAlert';
 import SearchSelect from '../../../input/searchSelect';
+import PageHeader from '../../../forms/header/pageHeader';
 
-const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
+const PreliminaryProjectCRUD  = ({ name, urls, title, subtitle, stageID }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
 
@@ -30,20 +31,23 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   });
 
   const options = [
-    { label: `Identificador de la Revisión de la Especialización`, value: 'specializationHasUserID' },
+    { label: `Identificador de la Revisión de la Especialización`, value: 'specializationHasSemesterID' },
+    { label: `Rut del Estudiante`, value: 'rut' },
     { label: `Nombre Completo del Estudiante`, value: 'fullName' },
-    { label: `Identificador de la Especialización`, value: 'specializationID' },
+    { label: `Email del Estudiante`, value: 'email' },
     { label: `Nombre de la Especialización`, value: 'name' },
-    { label: `Identificador del Estado de la Revisión`, value: 'evaluationStatusID' },
+    { label: `Tipo de Evaluacion`, value: 'typeEvaluateName' },
     { label: `Nombre del Estado de la Revisión`, value: 'evaluationStatusName' },
-    { label: `Identificador del Semestre`, value: 'semesterID' },
-    { label: `Fecha de Inicio`, value: 'startDate' },
-    { label: `Fecha de Finalización`, value: 'finishDate' },
-    { label: `Tipo de Semestre`, value: 'semesterNumber' },
-    { label: `Año del Semestre`, value: 'year' },
-    { label: `Nombre Completo del Primer Academíco`, value: 'academic1_fullName' },
-    { label: `Nombre Completo del Segundo Academíco`, value: 'academic2_fullName' },
-    { label: `Nombre Completo del Tercer Academíco`, value: 'academic3_fullName' },
+    { label: `Estado` , value: 'statusName'},
+    { label: `Rut del Académico Guia`, value: 'guideAcademic_rut' },
+    { label: `Rut del Académico A`, value: 'academicA_rut' },
+    { label: `Rut del Académico B`, value: 'academicB_rut' },
+    { label: `Nombre Completo del Académico Guia`, value: 'guideAcademic_fullName' },
+    { label: `Nombre Completo del Académico A`, value: 'academicA_fullName' },
+    { label: `Nombre Completo del Académico B`, value: 'academicB_fullName' },
+    { label: `Email del Académico Guia`, value: 'guideAcademic_email' },
+    { label: `Email del Académico A`, value: 'academicA_email' },
+    { label: `Email del Académico B`, value: 'academicB_email' },
   ];
 
   const [updateId, setUpdateId] = useState(null);
@@ -81,7 +85,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       if (access_token) {
         setMessageWaiting(true);
         const config = {
-          specializationHasUserID: updateId,
+          specializationHasSemesterID: updateId,
           ...newItem,
           access_token,
         };
@@ -102,7 +106,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   const handleEdit = (item) => {
-    setUpdateId(item.specializationHasUserID);
+    setUpdateId(item.specializationHasSemesterID);
     setNewItem({
       evaluationStatusID: item.evaluationStatusID
     });
@@ -255,7 +259,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   // -------------------------------Funciones para la Paginacion-------------------------------
-  const [searchType, setSearchType] = useState('specializationHasUserID');
+  const [searchType, setSearchType] = useState('specializationHasSemesterID');
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType2] = useState('semesterID');
   const [searchTerm2, setSearchTerm2] = useState('');
@@ -318,9 +322,11 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   // -------------------------------Contenido de los items-------------------------------
-
   const theadContent = (
     <tr>
+      <th className='whitespace-nowrap px-4 py-2 text-center font-medium text-gray-900'>
+        Asignar de Académicos
+      </th>
       {options.map((option) => (
         <th key={option.value} className='whitespace-nowrap px-4 py-2 font-medium text-gray-900'>
           <div className='flex items-center justify-center text-center gap-1'>
@@ -329,9 +335,6 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
           </div>
         </th>
       ))}
-      <th className='whitespace-nowrap px-4 py-2 text-center font-medium text-gray-900'>
-        Acciones
-      </th>
     </tr>
   );
 
@@ -345,31 +348,56 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
         </tr>
       )}
       {getCurrentPageItems().map((item) => (
-        <tr key={item.specializationHasUserID} className='text-center'>
-          <td className='px-4 py-2'>{item.specializationHasUserID}</td>
-          <td className='whitespace-nowrap px-4 py-2'>{item.fullName}</td>
-          <td className='px-4 py-2'>{item.specializationID}</td>
-          <td className='whitespace-nowrap px-4 py-2'>{item.name}</td>
-          <td className='px-4 py-2'>{item.evaluationStatusID}</td>
-          <td className='px-4 py-2'>{item.evaluationStatusName}</td>
-          <td className='px-4 py-2'>{item.semesterID}</td>
-          <td className='px-4 py-2'>{item.startDate}</td>
-          <td className='px-4 py-2'>{item.finishDate}</td>
-          <td className='px-4 py-2'>{item.semesterNumber}</td>
-          <td className='px-4 py-2'>{item.year}</td>
-          <td className='px-4 py-2'>{item.academic1_fullName}</td>
-          <td className='px-4 py-2'>{item.academic2_fullName}</td>
-          <td className='px-4 py-2'>{item.academic3_fullName}</td>
-          <td className='px-4 py-2'>
-            <div className='w-full flex-1 sm:w-60'>
+        <tr key={item.specializationHasSemesterID} className='text-center'>
+          <td className='px-4 py-2 flex flex-row gap-1'>
+            <div className='flex-1 sm:w-60'>
               <CustomButton onClick={() => handleEdit(item)} type='button' color='orange' padding_x='4' padding_smx='6' padding_mdx='8' padding_y='2' width='full' height='10'>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                 </svg>
-                Actualizar Estado
+                Actualizar Evaluación
               </CustomButton>
             </div>
+            <div className='flex-1 sm:w-60'>
+              <Link
+                target="_blank"
+                rel="noopener noreferrer"
+                to={`/Administrative/Academic/Evaluate/PreliminaryProject/${item.specializationHasUserID}/${item.specializationHasSemesterID}/${stageID}`}
+              >
+                <CustomButton
+                  type="button"
+                  color='orange'
+                  padding_x='4'
+                  padding_smx='6'
+                  padding_mdx='8'
+                  padding_y='2'
+                  width='full'
+                  height='full'
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />                                                </svg>
+                  {(stageID === 1) ? 'Etapa 1' : 'Etapa 2'}
+                </CustomButton>
+              </Link>
+            </div>
           </td>
+          <td className='px-4 py-2'>{item.specializationHasSemesterID}</td>
+          <td className='whitespace-nowrap px-4 py-2'>{item.rut}</td>
+          <td className='whitespace-nowrap px-4 py-2'>{item.fullName}</td>
+          <td className='whitespace-nowrap px-4 py-2'>{item.email}</td>
+          <td className='whitespace-nowrap px-4 py-2'>{item.name}</td>
+          <td className='px-4 py-2'>{item.typeEvaluateName}</td>
+          <td className='px-4 py-2'>{item.evaluationStatusName}</td>
+          <td className='px-4 py-2'>{item.statusName}</td>
+          <td className='px-4 py-2'>{item.guideAcademic_rut}</td>
+          <td className='px-4 py-2'>{item.academicA_rut}</td>
+          <td className='px-4 py-2'>{item.academicB_rut}</td>
+          <td className='px-4 py-2'>{item.guideAcademic_fullName}</td>
+          <td className='px-4 py-2'>{item.academicA_fullName}</td>
+          <td className='px-4 py-2'>{item.academicB_fullName}</td>
+          <td className='px-4 py-2'>{item.guideAcademic_email}</td>
+          <td className='px-4 py-2'>{item.academicA_email}</td>
+          <td className='px-4 py-2'>{item.academicB_email}</td>
         </tr>
       ))}
     </>
@@ -383,8 +411,8 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
 
       <ModalCRUD isOpen={ModalOpen}>
         <FormContainer
-          createMessage={`Asignar Academícos`}
-          create2Message={`Asignación de Academícos`}
+          updateMessage={`Actualizar Evaluación`}
+          update2Message={`Actualización de la Evaluación`}
           updateId={updateId}
           itemName={itemName}
           pText={''}
@@ -402,14 +430,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       </ModalCRUD>
 
       <div className='min-h-screen'>
-        <div className="text-center mb-4">
-          <h1 className="text-3xl sm:text-4xl font-semibold text-gray-900">
-            {title}
-          </h1>
-          <p className="text-md sm:text-lg font-medium text-gray-500">
-            {subtitle}
-          </p>
-        </div>
+        <PageHeader title={title} subtitle={subtitle} />
         <SearchWithSelect selectId={`${searchType}`} searchTerm={searchTerm} setSearchTerm={setSearchTerm} searchType={searchType} setSearchType={setSearchType} options={options} />
         <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
         <TabNavigation setSearchTerm={setSearchTerm2} currentTab={currentTab} setCurrentTab={setCurrentTab} items={semester} itemsPerPage={1} />
@@ -419,4 +440,4 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   );
 };
 
-export default SpecializationHasSemesterCRUD;
+export default PreliminaryProjectCRUD ;

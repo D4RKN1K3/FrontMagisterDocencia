@@ -12,6 +12,6 @@ export const Student = () => {
 
 
     return (
-        <StudentCRUD name={'Estudiante'} urls={myUrls} title={`Bienvenido a gestión de estudiantes`} subtitle={'CRUD de Estudiantes'} />
+        <StudentCRUD name={'Estudiante'} urls={myUrls} title={`Bienvenido a Administración de Estudiantes`} subtitle={'Sistema Administrativo'} />
     )
 }

@@ -75,7 +75,7 @@ const SpecializationSection = ({ items, selectedItems, handleEdit, children, upd
 
                                     {item.completionSemester ? (
                                         <>
-                                           a {item.completionSemester.year} - {item.completionSemester.semesterNumber === 1 ? 'Primer' : 'Segundo'} Semestre
+                                        {' '} a {item.completionSemester.year} - {item.completionSemester.semesterNumber === 1 ? 'Primer' : 'Segundo'} Semestre
                                         </>
                                     ) : null}
                                 </span>

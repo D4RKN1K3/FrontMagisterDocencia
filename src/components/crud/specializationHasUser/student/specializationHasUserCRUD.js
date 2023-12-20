@@ -13,6 +13,7 @@ import SearchWithSelect from '../../../search/searchWithSelect';
 import PaginationButtons from '../../../button/table/paginationButtons';
 import SearchSelect from '../../../input/searchSelect';
 import SpecializationSection from '../../../sections/specialization/specializationSection';
+import PageHeader from '../../../forms/header/pageHeader';
 
 const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
@@ -306,7 +307,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
         const format = sortedItems.map(item => ({
           value: item.semesterID,
           label: `${item.year} - ${item.semesterNumber === 1 ? 'Primer' : 'Segundo'} Semestre`
-        }));        
+        }));
         setSemester(format);
       }
     }
@@ -370,14 +371,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       {messageVerification && (<AlertVerification message={messageVerification} onClose={closeAlert} />)}
 
       <div className='min-h-screen'>
-        <div className="text-center mb-4">
-          <h1 className="text-3xl sm:text-4xl font-semibold text-gray-900">
-            {title}
-          </h1>
-          <p className="text-md sm:text-lg font-medium text-gray-500">
-            {subtitle}
-          </p>
-        </div>
+        <PageHeader title={title} subtitle={subtitle} />
 
         <SearchWithSelect selectId={`${searchType}`} searchTerm={searchTerm} setSearchTerm={setSearchTerm} searchType={searchType} setSearchType={setSearchType} options={options} />
 

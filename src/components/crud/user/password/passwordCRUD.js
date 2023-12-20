@@ -10,7 +10,7 @@ import WaitingAlert from '../../../alert/waitingAlert';
 import { PUTRequest } from '../../../../utils/requestHelpers';
 import { renewSession, deniedSession } from '../../../../utils/sessionHelpers';
 import { isPasswordValid } from '../../../../utils/validationUtils';
-import FormHeaderNotUpdate from '../../../forms/body/formContainerNotUpdate'
+import FormContainerNotUpdate from '../../../forms/body/formContainerNotUpdate'
 import TextInput from '../../../input/textInput';
 import CustomButton from '../../../button/customButton';
 
@@ -143,7 +143,7 @@ const PasswordCRUD = ({ urls, id }) => {
       {messageVerification && (<AlertVerification message={messageVerification} onClose={closeAlert} />)}
 
       <ModalCRUD isOpen={modalOpen}>
-        <FormHeaderNotUpdate
+        <FormContainerNotUpdate
           message={'Cambio de Contraseña'}
           secondaryMessage={''}
           pText={getPasswordRequirementsText()}
@@ -158,7 +158,7 @@ const PasswordCRUD = ({ urls, id }) => {
             onChange={(e) => setNewItem({ ...newItem, password: e.target.value })}
             placeholder={`Ingresar Contraseña`}
           />
-        </FormHeaderNotUpdate>
+        </FormContainerNotUpdate>
       </ModalCRUD>
 
 

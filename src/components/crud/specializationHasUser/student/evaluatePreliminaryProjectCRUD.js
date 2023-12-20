@@ -20,7 +20,7 @@ import ModalFile from '../../../modal/modalFile';
 import { PDFViewer } from '@react-pdf/renderer';
 import ExportPDF from '../../handleRubric/exportPDF/exportPDF';
 
-const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
+const EvaluatePreliminaryProjectCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
   const { stageID, specializationHasUserID, specializationHasSemesterID } = useParams();
@@ -29,6 +29,8 @@ const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
   const [specializationHasStudent, setspecializationHasStudent] = useState([]);
   const [rubricHasQuestion, setRubricHasQuestion] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+
+  const [academicName, setAcamicName] = useState('');
 
   const [updateId, setUpdateId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,6 +46,7 @@ const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
         const config = {
           ...params,
           access_token,
+          typeEvaluateID : 1,
         };
         const response = await GETRequest(url, config);
         OptionMessage(response, nameSelect);
@@ -56,8 +59,8 @@ const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
     }
   };
 
-  const fetchRubric = async (evaluateID, academicID) => {
-    if (!academicID){
+  const fetchRubric = async (evaluateID, academicID, academicName) => {
+    if (!academicID) {
       setMessageError('No tiene Académicos Asignados');
       return;
     }
@@ -66,15 +69,18 @@ const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
       const url = urls[2];
       if (access_token) {
         setMessageWaiting(true);
+        setAcamicName(academicName)
         const config = {
           access_token,
           specializationHasUserID,
           stageID,
           specializationHasSemesterID,
           evaluateID,
-          academicID, 
+          academicID,
+          typeEvaluateID : 1,
         };
         const response = await GETRequest(url, config);
+        console.log(response)
         OptionMessage(response, 'rubricHasQuestion');
       } else {
         setMessageError('No tienes una session');
@@ -102,6 +108,7 @@ const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
             specializationHasUserID,
             stageID,
             specializationHasSemesterID,
+            typeEvaluateID : 1,
           };
           const response = await POSTFileRequest(url, config, selectedFile);
           OptionMessage(response);
@@ -133,6 +140,7 @@ const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
             specializationHasUserID,
             stageID,
             specializationHasSemesterID,
+            typeEvaluateID : 1,
           };
           const response = await PUTFileRequest(url, config, selectedFile);
           OptionMessage(response);
@@ -231,12 +239,17 @@ const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
     else if (data) {
       if (nameSelect === 'specializationHasStudent') {
         setspecializationHasStudent(data);
-      } else if (nameSelect === 'rubricHasQuestion'){
-        const sortedItems = sortItems(data, 'questionID', 'asc');
-        setRubricHasQuestion(sortedItems);
-        openModalFile();
+      } else if (nameSelect === 'rubricHasQuestion') {
+        if (data.length > 0) {
+          const sortedItems = sortItems(data, 'questionID', 'asc');
+          setRubricHasQuestion(sortedItems);
+          openModalFile();
+        } else {
+          setMessageError('La evaluación del académico asignado aún no ha sido completada');
+        }
+      } else {
+        setItems(data);
       }
-      setItems(data);
     }
     else {
       setMessageError('Error Inesperado');
@@ -332,7 +345,7 @@ const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
       <ModalFile isOpen={ModalOpenFile} onClose={closeModalFile}>
         <div className="w-full h-screen">
           <PDFViewer width="100%" height="100%">
-            <ExportPDF rubricHasQuestion={rubricHasQuestion} />
+            <ExportPDF rubricHasQuestion={rubricHasQuestion} academicName={academicName} />
           </PDFViewer>
         </div>
       </ModalFile>
@@ -347,10 +360,10 @@ const EvaluateCRUD = ({ name, urls, title, subtitle }) => {
 
         <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={items.length} />
 
-        <TableStage items={getCurrentPageItems()} specializationHasStudent={specializationHasStudent} handleEdit={handleEdit} fetchRubric={fetchRubric}/>
+        <TableStage items={getCurrentPageItems()} specializationHasStudent={specializationHasStudent} handleEdit={handleEdit} fetchRubric={fetchRubric} />
       </div>
     </div >
   );
 };
 
-export default EvaluateCRUD;
+export default EvaluatePreliminaryProjectCRUD;

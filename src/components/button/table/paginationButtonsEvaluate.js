@@ -6,17 +6,21 @@ const PaginationButtons = ({
   length,
   itemsPerPage,
   numberFiltered,
+  setShowRubric
 }) => {
   const handlePrevPage = () => {
+    setShowRubric(false);
     setCurrentPage((prevPage) => Math.max(1, prevPage - 1));
   };
 
   const handleNextPage = () => {
+    setShowRubric(false);
     const totalPages = Math.ceil(length / itemsPerPage);
     setCurrentPage((prevPage) => Math.min(totalPages, prevPage + 1));
   };
 
   const handlePageChange = (page) => {
+    setShowRubric(false);
     setCurrentPage(page);
   };
 

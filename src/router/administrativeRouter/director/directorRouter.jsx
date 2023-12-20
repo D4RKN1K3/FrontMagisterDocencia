@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { Home } from '../../../Pages/administrative/director/home';
 import { Users } from '../../../Pages/administrative/director/users/users';
 import { Academic } from '../../../Pages/administrative/director/academic/academic';
+import { HandleTitleAcademic } from '../../../Pages/administrative/director/academic/handleTitle/handleTitle';
 import { Student } from '../../../Pages/administrative/director/student/student';
 import { Document } from '../../../Pages/administrative/director/student/document/document';
 import { HandleTitle } from '../../../Pages/administrative/director/student/handleTitle/handleTitle';
@@ -16,6 +17,7 @@ const DirectorRouter = () => {
         <Route index element={<Home />} />
         <Route path="Users" element={<Users />} />
         <Route path="Academic" element={<Academic />} />
+        <Route path="HandleTitleAcademic/:userID" element={<HandleTitleAcademic />} />
         <Route path="Student" element={<Student />} />
         <Route path="Document/:userID" element={<Document />} />
         <Route path="HandleTitle/:userID" element={<HandleTitle />} />

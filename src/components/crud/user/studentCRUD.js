@@ -50,9 +50,9 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
   });
 
   const options = [
-    { label: `Identificador del ${itemName}`, value: 'userID' },
-    { label: `Rut del ${itemName}`, value: 'rut' },
-    { label: `Email del ${itemName}`, value: 'email' },
+    { label: `Identificador`, value: 'userID' },
+    { label: `RUT`, value: 'rut' },
+    { label: `Email`, value: 'email' },
     { label: `Primer Nombre`, value: 'firstName' },
     { label: `Segundo Nombre`, value: 'secondName' },
     { label: `Primer Apellido`, value: 'surnameM' },
@@ -60,17 +60,17 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
     { label: `Sexo`, value: 'sex' },
     { label: `Estado Civil`, value: 'stateCivil' },
     { label: `Fecha de Nacimiento`, value: 'birthday' },
-    { label: `Direccion`, value: 'address' },
+    { label: `Dirección`, value: 'address' },
     { label: `Lugar de Trabajo`, value: 'placeWork' },
-    { label: `Teléfono del ${itemName}`, value: 'phone' },
+    { label: `Teléfono`, value: 'phone' },
     { label: `Teléfono del Trabajo`, value: 'phoneWork' },
     { label: `Cargo de Trabajo`, value: 'job' },
-    { label: `Fecha de Creacion`, value: 'entry' },
-    { label: `Titulos del ${itemName}`, value: 'titlesName' },
+    { label: `Fecha de Creación`, value: 'entry' },
+    { label: `Títulos`, value: 'titlesName' },
   ];
   const options2 = [
     { label: `Fecha de Nacimiento`, value: 'birthday' },
-    { label: `Fecha de Creacion`, value: 'entry' },
+    { label: `Fecha de Creación`, value: 'entry' },
   ];
   
   const validMaritalStatuses = ['Soltero/a', 'Casado/a', 'Divorciado/a', 'Viudo/a', 'Otro'];
@@ -531,7 +531,7 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
               <ExcelExportComponent
                 items={items}
                 fileName={`${name}s`}
-                label={`${name}s`}
+                label={``}
                 searchTerm={searchTerm}
                 searchType={searchType}
                 sortProperty={sortProperty}
@@ -541,7 +541,7 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
             <div className='flex-1 w-full'>
               <ImportCRUD
                 name={name}
-                label={`${name}s`}
+                label={``}
                 url={urls[2]}
                 handleFetchItems={fetchItems}
               />
@@ -601,8 +601,8 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
                       onChange={(e) => handleCheckboxChange(e, item)}
                     />
                   </td>
-                  <td className='px-4 py-2'>{item.userID}</td>
-                  <td className='px-4 py-2'>{item.rut}</td>
+                  <td className='px-4 py-2 whitespace-nowrap'>{item.userID}</td>
+                  <td className='px-4 py-2 whitespace-nowrap'>{item.rut}</td>
                   <td className='px-4 py-2'>{item.email}</td>
                   <td className='px-4 py-2'>{item.firstName}</td>
                   <td className='px-4 py-2'>{item.secondName}</td>
@@ -621,7 +621,7 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
                     {renderTitles(item.titlesName)}
                   </td>
                   <td className='px-4 py-2 flex gap-2'>
-                    <div className='w-40'>
+                    <div className='w-60'>
                       <CustomButton
                         onClick={() => handleEdit(item)} type='button'
                         color='orange'
@@ -639,7 +639,7 @@ const StudentCRUD = ({ name, urls, title, subtitle }) => {
                             d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
                           />
                         </svg>
-                        Actualizar
+                        Actualizar Estudiante
                       </CustomButton>
                     </div>
                     <div className='w-60'>

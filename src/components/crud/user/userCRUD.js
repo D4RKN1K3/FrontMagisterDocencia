@@ -54,9 +54,9 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
   });
 
   const options = [
-    { label: `Identificador del ${itemName}`, value: 'userID' },
-    { label: `Rut del ${itemName}`, value: 'rut' },
-    { label: `Email del ${itemName}`, value: 'email' },
+    { label: `ID`, value: 'userID' },
+    { label: `RUT`, value: 'rut' },
+    { label: `Email`, value: 'email' },
     { label: `Primer Nombre`, value: 'firstName' },
     { label: `Segundo Nombre`, value: 'secondName' },
     { label: `Primer Apellido`, value: 'surnameM' },
@@ -64,13 +64,13 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
     { label: `Sexo`, value: 'sex' },
     { label: `Estado Civil`, value: 'stateCivil' },
     { label: `Fecha de Nacimiento`, value: 'birthday' },
-    { label: `Direccion`, value: 'address' },
+    { label: `Dirección`, value: 'address' },
     { label: `Lugar de Trabajo`, value: 'placeWork' },
     { label: `Teléfono del ${itemName}`, value: 'phone' },
     { label: `Teléfono del Trabajo`, value: 'phoneWork' },
     { label: `Cargo de Trabajo`, value: 'job' },
-    { label: `Fecha de Creacion`, value: 'entry' },
-    { label: `Roles de ${itemName}`, value: 'roles' },
+    { label: `Fecha de Creación`, value: 'entry' },
+    { label: `Roles`, value: 'roles' },
   ];
   const options2 = [
     { label: `Fecha de Nacimiento`, value: 'birthday' },
@@ -528,21 +528,21 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
         
         {items.length !== 0 && (
           <div className='my-2 flex flex-col items-center gap-1 sm:gap-2 sm:flex-row sm:justify-center'>
-            <div className='flex-1 w-full'>
+            <div className='w-96'>
               <ExcelExportComponent
                 items={items}
                 fileName={`${name}s`}
-                label={`${name}s`}
+                label={``}
                 searchTerm={searchTerm}
                 searchType={searchType}
                 sortProperty={sortProperty}
                 sortDirection={sortDirection}
               />
             </div>
-            <div className='flex-1 w-full'>
+            <div className='w-96'>
               <ImportCRUD
                 name={name}
-                label={'Estudiantes'}
+                label={''}
                 url={urls[4]}
                 handleFetchItems={fetchItems}
               />
@@ -603,7 +603,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
                     />
                   </td>
                   <td className='px-4 py-2'>{item.userID}</td>
-                  <td className='px-4 py-2'>{item.rut}</td>
+                  <td className='whitespace-nowrap px-4 py-2'>{item.rut}</td>
                   <td className='px-4 py-2'>{item.email}</td>
                   <td className='px-4 py-2'>{item.firstName}</td>
                   <td className='px-4 py-2'>{item.secondName}</td>
@@ -640,7 +640,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
                     ))}
                   </td>
                   <td className='px-4 py-2 flex gap-2'>
-                    <div className='w-40'>
+                    <div className='w-60'>
                       <CustomButton
                         onClick={() => handleEdit(item)} type='button'
                         color='orange'
@@ -654,7 +654,7 @@ const UserCRUD = ({ name, urls, title, subtitle }) => {
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                         </svg>
-                        Actualizar
+                        Actualizar Usuario
                       </CustomButton>
                     </div>
                     <div className='w-40'>

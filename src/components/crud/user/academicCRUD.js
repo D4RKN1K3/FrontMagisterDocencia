@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import ModalCRUD from '../../modal/modalCRUD';
 import Alert from '../../alert/alert';
@@ -49,8 +49,9 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
   });
 
   const options = [
-    { label: `Identificador del ${itemName}`, value: 'userID' },
-    { label: `Rut del ${itemName}`, value: 'rut' },
+    { label: `Identificador`, value: 'userID' },
+    { label: `RUT`, value: 'rut' },
+    { label: `Email`, value: 'email' },
     { label: `Primer Nombre`, value: 'firstName' },
     { label: `Segundo Nombre`, value: 'secondName' },
     { label: `Primer Apellido`, value: 'surnameM' },
@@ -58,14 +59,14 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
     { label: `Sexo`, value: 'sex' },
     { label: `Estado Civil`, value: 'stateCivil' },
     { label: `Fecha de Nacimiento`, value: 'birthday' },
-    { label: `Direccion`, value: 'address' },
-    { label: `Email del ${itemName}`, value: 'email' },
-    { label: `Telefono del ${itemName}`, value: 'phone' },
-    { label: `Fecha de Creacion`, value: 'entry' },
+    { label: `Dirección`, value: 'address' },
+    { label: `Teléfono`, value: 'phone' },
+    { label: `Fecha de Creación`, value: 'entry' },
+    { label: `Títulos`, value: 'titlesName' },
   ];
   const options2 = [
     { label: `Fecha de Nacimiento`, value: 'birthday' },
-    { label: `Fecha de Creacion`, value: 'entry' },
+    { label: `Fecha de Creación`, value: 'entry' },
   ];
 
   const validMaritalStatuses = ['Soltero/a', 'Casado/a', 'Divorciado/a', 'Viudo/a', 'Otro'];
@@ -326,6 +327,29 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
     return filteredItems.length;
   }
 
+  const renderTitles = (titlesName) => {
+    if (titlesName == null) {
+      return null;
+    }
+
+    const titlesArray = titlesName.split(',').map((title) => title.trim());
+
+    const groups = [];
+    for (let i = 0; i < titlesArray.length; i += 3) {
+      groups.push(titlesArray.slice(i, i + 3));
+    }
+
+    return groups.map((group, index) => (
+      <div key={index} className="flex gap-1 flex-wrap items-center justify-center">
+        {group.map((title, index) => (
+          <div key={index} className="break-words whitespace-nowrap text-xs font-medium w-max h-max px-2 py-1.5 rounded-lg bg-orange-500 text-white mb-1">
+            {title}
+          </div>
+        ))}
+      </div>
+    ));
+  };
+
   // -------------------------------Funciones de Extra-------------------------------
 
   const isMounted = useRef(false);
@@ -537,8 +561,9 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
                       onChange={(e) => handleCheckboxChange(e, item)}
                     />
                   </td>
-                  <td className='px-4 py-2'>{item.userID}</td>
-                  <td className='px-4 py-2'>{item.rut}</td>
+                  <td className='px-4 py-2 whitespace-nowrap'>{item.userID}</td>
+                  <td className='px-4 py-2 whitespace-nowrap'>{item.rut}</td>
+                  <td className='px-4 py-2'>{item.email}</td>
                   <td className='px-4 py-2'>{item.firstName}</td>
                   <td className='px-4 py-2'>{item.secondName}</td>
                   <td className='px-4 py-2'>{item.surnameM}</td>
@@ -547,11 +572,13 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
                   <td className='px-4 py-2'>{item.stateCivil}</td>
                   <td className='px-4 py-2'>{item.birthday}</td>
                   <td className='px-4 py-2'>{item.address}</td>
-                  <td className='px-4 py-2'>{item.email}</td>
                   <td className='px-4 py-2'>{item.phone}</td>
                   <td className='px-4 py-2'>{item.entry}</td>
+                  <td className='px-4 py-2'>
+                    {renderTitles(item.titlesName)}
+                  </td>
                   <td className='px-4 py-2 flex gap-2'>
-                    <div className='w-40'>
+                    <div className='w-60'>
                       <CustomButton
                         onClick={() => handleEdit(item)} type='button'
                         color='orange'
@@ -569,8 +596,31 @@ const AcademicCRUD = ({ name, urls, title, subtitle }) => {
                             d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
                           />
                         </svg>
-                        Actualizar
+                        Actualizar Académico
                       </CustomButton>
+                    </div>
+                    <div className='w-60'>
+                      <Link
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        to={`${urls[2]}${item.userID}`}
+                      >
+                        <CustomButton
+                          type="button"
+                          color='orange'
+                          padding_x='4'
+                          padding_smx='6'
+                          padding_mdx='8'
+                          padding_y='2'
+                          width='full'
+                          height='10'
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                          </svg>
+                          Gestionar Titulación
+                        </CustomButton>
+                      </Link>
                     </div>
                   </td>
                 </tr>

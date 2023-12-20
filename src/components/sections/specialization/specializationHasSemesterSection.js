@@ -115,29 +115,48 @@ const SpecializationHasSemesterSection = ({ items, semester, selectedItems, hand
                                             : 'Estado aún no asignado'}
                                     </div>
                                 </div>
-                                <span className={`${(updateId && updateId === item.specializationHasSemesterID) ? 'hidden' : 'flex justify-center sm:justify-start'} text-xl font-bold md:text-2xl`}>{item.name} - {item.typeEvaluateName}</span>
+                                <span className={`${(updateId && updateId === item.specializationHasSemesterID) ? 'hidden' : 'flex justify-center sm:justify-start'} text-xl font-bold md:text-2xl mb-1 sm:mb-2`}>{item.name} - {item.typeEvaluateName}</span>
                                 {(updateId && updateId === item.specializationHasSemesterID) && (
                                     <div className='mt-2 mb-1'>
                                         {children}
                                     </div>
                                 )}
                                 <span className="text-xs sm:text-sm text-orange-400">
-                                    {format(new Date(item.startDate), 'dd/MM/yyyy')}-{format(new Date(item.finishDate), 'dd/MM/yyyy')}  {format(new Date(item.startDate), 'HH:mm')}-{format(new Date(item.finishDate), 'HH:mm')}
+                                    Periodo de Entrega : {format(new Date(item.startDate), 'dd/MM/yyyy')}-{format(new Date(item.finishDate), 'dd/MM/yyyy')}  {format(new Date(item.startDate), 'HH:mm')}-{format(new Date(item.finishDate), 'HH:mm')}
                                 </span>
-                                {(item.guideAcademic_fullName) ?
-                                    <>
+                                {(item.typeEvaluateID === 1) && (
+                                    item.guideAcademic_fullName ? (
+                                        <>
+                                            <span className="break-words mt-1 text-xs sm:text-sm text-gray-500">
+                                                {item.guideAcademic_fullName} - {item.academicA_fullName} - {item.academicB_fullName}
+                                            </span>
+                                            <span className="break-words mb-1 text-xs sm:text-sm text-gray-500">
+                                                {item.guideAcademic_email} - {item.academicA_email} - {item.academicB_email}
+                                            </span>
+                                        </>
+                                    ) : (
                                         <span className="break-words my-1 text-xs sm:text-sm text-gray-500">
-                                            {item.guideAcademic_fullName} - {item.academicA_fullName} - {item.academicB_fullName}
+                                            Académicos aún no asignados
                                         </span>
+                                    )
+                                )}
+                                {(item.typeEvaluateID === 2) && (
+                                    item.director_fullName ? (
+                                        <>
+                                            <span className="break-words mt-1 text-xs sm:text-sm text-gray-500">
+                                                {item.director_fullName} - {item.codirector_fullName}
+                                            </span>
+                                            <span className="break-words mb-1 text-xs sm:text-sm text-gray-500">
+                                                {item.director_email} - {item.codirector_email}
+                                            </span>
+                                        </>
+                                    ) : (
                                         <span className="break-words my-1 text-xs sm:text-sm text-gray-500">
-                                            {item.guideAcademic_email} - {item.academicA_email} - {item.academicB_email}
+                                            Académicos aún no asignados
                                         </span>
-                                    </>
-                                    :
-                                    <span className="break-words my-1 text-xs sm:text-sm text-gray-500">
-                                        Academícos aún no asignados
-                                    </span>
-                                }
+                                    )
+                                )}
+
                                 <span className="text-xs sm:text-sm font-bold text-orange-400">
                                     {item.evaluationStatusName}
                                 </span>
@@ -194,35 +213,13 @@ const SpecializationHasSemesterSection = ({ items, semester, selectedItems, hand
                                             </CustomButton>
                                         </div>
                                     )}
-
-                                    <div className='flex-1'>
-                                        <Link
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            to={`/Dashboard/Specialization/Evaluate/${item.specializationHasUserID}/${item.specializationHasSemesterID}/1`}
-                                        >
-                                            <CustomButton
-                                                type="button"
-                                                color='orange'
-                                                padding_x='4'
-                                                padding_smx='6'
-                                                padding_mdx='8'
-                                                padding_y='2'
-                                                width='full'
-                                                height='full'
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />                                                </svg>
-                                                Etapa 1
-                                            </CustomButton>
-                                        </Link>
-                                    </div>
-                                    {(item.evaluationStatusID >= 10 || item.evaluationStatusID === 4) && (
+                                    {(item.typeEvaluateID === 1) && <>
                                         <div className='flex-1'>
                                             <Link
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                to={`/Dashboard/Specialization/Evaluate/${item.specializationHasUserID}/${item.specializationHasSemesterID}/2`}                                                >
+                                                to={`/Dashboard/Specialization/Evaluate/PreliminaryProject/${item.specializationHasUserID}/${item.specializationHasSemesterID}/1`}
+                                            >
                                                 <CustomButton
                                                     type="button"
                                                     color='orange'
@@ -235,11 +232,58 @@ const SpecializationHasSemesterSection = ({ items, semester, selectedItems, hand
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />                                                </svg>
-                                                    Etapa 2
+                                                    Etapa 1
                                                 </CustomButton>
                                             </Link>
                                         </div>
-                                    )}
+                                        {(item.evaluationStatusID >= 10 || item.evaluationStatusID === 4 || item.evaluationStatusID === 5) && (
+                                            <div className='flex-1'>
+                                                <Link
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    to={`/Dashboard/Specialization/Evaluate/PreliminaryProject/${item.specializationHasUserID}/${item.specializationHasSemesterID}/2`}                                                >
+                                                    <CustomButton
+                                                        type="button"
+                                                        color='orange'
+                                                        padding_x='4'
+                                                        padding_smx='6'
+                                                        padding_mdx='8'
+                                                        padding_y='2'
+                                                        width='full'
+                                                        height='full'
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />                                                </svg>
+                                                        Etapa 2
+                                                    </CustomButton>
+                                                </Link>
+                                            </div>
+                                        )}
+                                    </>}
+                                    {(item.typeEvaluateID === 2) && <>
+                                        <div className='flex-1'>
+                                            <Link
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                to={`/Dashboard/Specialization/Evaluate/Thesis/${item.specializationHasUserID}/${item.specializationHasSemesterID}/1`}
+                                            >
+                                                <CustomButton
+                                                    type="button"
+                                                    color='orange'
+                                                    padding_x='4'
+                                                    padding_smx='6'
+                                                    padding_mdx='8'
+                                                    padding_y='2'
+                                                    width='full'
+                                                    height='full'
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />                                                </svg>
+                                                    Etapa 1
+                                                </CustomButton>
+                                            </Link>
+                                        </div>
+                                    </>}
                                 </div>
                             </div>
                         </div>

@@ -2,7 +2,8 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { SpecializationHasUser } from '../../../Pages/student/specialization/specializationHasUser';
 import { SpecializationHasSemester } from '../../../Pages/student/specialization/specializationHasSemester';
-import { Evaluate } from '../../../Pages/student/specialization/evaluate';
+import { EvaluatePreliminaryProject } from '../../../Pages/student/specialization/evaluatePreliminaryProject';
+import { EvaluateThesis } from '../../../Pages/student/specialization/evaluateThesis';
 
 const SpecializationRouter = () => {
   return (
@@ -10,7 +11,8 @@ const SpecializationRouter = () => {
       <Route path="/">
         <Route index element={<SpecializationHasUser />} />
         <Route path=":specializationHasUserID" element={<SpecializationHasSemester />} />
-        <Route path="Evaluate/:specializationHasUserID/:specializationHasSemesterID/:stageID" element={<Evaluate />} />
+        <Route path="Evaluate/PreliminaryProject/:specializationHasUserID/:specializationHasSemesterID/:stageID" element={<EvaluatePreliminaryProject />} />
+        <Route path="Evaluate/Thesis/:specializationHasUserID/:specializationHasSemesterID/:stageID" element={<EvaluateThesis />} />
       </Route>
     </Routes>
   );

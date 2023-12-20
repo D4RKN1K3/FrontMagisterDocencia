@@ -20,6 +20,7 @@ import FormContainer from '../../forms/body/formContainer';
 import Checkbox from '../../input/checkbox';
 import TextInput from '../../input/textInput';
 import SearchSelect from '../../input/searchSelect';
+import DynamicSelect from '../../input/dynamicSelect';
 
 const TitleCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
@@ -32,11 +33,13 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
     name: '',
     typeID: '',
     universityID: '',
+    departamentTitle: '',
   });
 
   const options = [
     { label: `Identificador del ${itemName}`, value: 'titleID' },
     { label: `Nombre del ${itemName}`, value: 'name' },
+    { label: `Departamento del Título`, value: 'departamentTitle' },
     { label: `Identificador del Tipo`, value: 'typeID' },
     { label: `Identificador de la Universidad`, value: 'universityID' },
     { label: `Nombre de la Universidad`, value: 'nameuniversity' },
@@ -48,6 +51,7 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
 
   const [type, setType] = useState([]);
   const [university, setUniversity] = useState([]);
+  const validDepartamentTitle = ['Educacio y Humanidad', 'Ingeniería', 'Ciencias', 'Medicina'];
 
   const [updateId, setUpdateId] = useState(null);
   const [selectAll, setSelectAll] = useState(false);
@@ -169,6 +173,7 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
       city: item.city,
       nameType: item.nameType,
       type: item.type,
+      departamentTitle: item.departamentTitle,
     });
     openModal();
   };
@@ -179,6 +184,7 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
       name: '',
       typeID: '',
       universityID: '',
+      departamentTitle: '',
     });
   };
 
@@ -419,6 +425,7 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
             onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
             placeholder={`Ingresar Nombre del Título`}
           />
+          <DynamicSelect selectId='departamentTitle' label="Seleccione Departamento del Título" options={validDepartamentTitle} value={newItem.departamentTitle} onChange={(e) => setNewItem({ ...newItem, departamentTitle: e.target.value })} />
           <SearchSelect
             selectId='typeID'
             placeholder="Seleccione Tipo"
@@ -509,6 +516,7 @@ const TitleCRUD = ({ name, urls, title, subtitle }) => {
                   </td>
                   <td className='px-4 py-2'>{item.titleID}</td>
                   <td className='whitespace-nowrap px-4 py-2'>{item.name}</td>
+                  <td className='px-4 py-2'>{item.departamentTitle}</td>
                   <td className='px-4 py-2'>{item.typeID}</td>
                   <td className='px-4 py-2'>{item.universityID}</td>
                   <td className='px-4 py-2'>{item.nameUniversity}</td>

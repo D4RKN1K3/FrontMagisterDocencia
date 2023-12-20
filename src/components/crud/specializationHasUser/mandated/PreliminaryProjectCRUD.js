@@ -1,42 +1,50 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import Alert from '../../../alert/alert';
 import AlertVerification from '../../../alert/alertVerification';
 import WaitingAlert from '../../../alert/waitingAlert';
 
-import { GETRequest, POSTRequest, PUTRequest, DELETERequest } from '../../../../utils/requestHelpers';
-import { filterItems, sortItems } from '../../../../utils/crudHelpers/searchFilter';
+import { GETRequest, POSTRequest, PUTRequest } from '../../../../utils/requestHelpers';
+import { filterMultipleItems, sortItems } from '../../../../utils/crudHelpers/searchFilter';
 import { renewSession, deniedSession } from '../../../../utils/sessionHelpers';
+import ModalCRUD from '../../../modal/modalCRUD';
+import FormContainer from '../../../forms/body/formContainer';
 import SearchWithSelect from '../../../search/searchWithSelect';
 import PaginationButtons from '../../../button/table/paginationButtons';
+import TabNavigation from '../../../tab/tabNavigation';
+import Table from '../../../table/table';
+import CustomButton from '../../../button/customButton';
+import SortButton from '../../../sort/sortButton';
+import IconOnlyAlert from '../../../alert/iconOnlyAlert';
 import SearchSelect from '../../../input/searchSelect';
-import SpecializationHasSemesterSection from '../../../sections/specialization/specializationHasSemesterSection';
 import PageHeader from '../../../forms/header/pageHeader';
 
-const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
+const PreliminaryProjectCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
-  const { specializationHasUserID } = useParams();
 
   const [items, setItems] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
   const [newItem, setNewItem] = useState({
-    typeEvaluateID: '',
-    semesterID: '',
+    academic1_userID: '',
+    academic2_userID: '',
+    academic3_userID: '',
+    evaluationStatusID: 2,
   });
 
   const options = [
-    { label: `Nombre de la ${itemName}`, value: 'typeEvaluateName' },
+    { label: `Identificador de la Revisión de la Especialización`, value: 'specializationHasSemesterID' },
+    { label: `Rut del Estudiante`, value: 'rut' },
+    { label: `Nombre Completo del Estudiante`, value: 'fullName' },
+    { label: `Email del Estudiante`, value: 'email' },
     { label: `Nombre de la Especialización`, value: 'name' },
-    { label: `Fecha de Inicio`, value: 'startDate' },
-    { label: `Fecha de Finalización`, value: 'finishDate' },
-    { label: `Numero del Semestre`, value: 'semesterNumber' },
-    { label: `Año del Semestre`, value: 'year' },
-    { label: `Estado`, value: 'statusName' },
-    { label: `Estado de la Evaluación`, value: 'evaluationStatusName' },
-    { label: `Descripcion del Estado de la Evaluación`, value: 'description' },
+    { label: `Tipo de Evaluacion`, value: 'typeEvaluateName' },
+    { label: `Nombre del Estado de la Revisión`, value: 'evaluationStatusName' },
+    { label: `Estado` , value: 'statusName'},
+    { label: `Rut del Académico Guia`, value: 'guideAcademic_rut' },
+    { label: `Rut del Académico A`, value: 'academicA_rut' },
+    { label: `Rut del Académico B`, value: 'academicB_rut' },
     { label: `Nombre Completo del Académico Guia`, value: 'guideAcademic_fullName' },
     { label: `Nombre Completo del Académico A`, value: 'academicA_fullName' },
     { label: `Nombre Completo del Académico B`, value: 'academicB_fullName' },
@@ -47,7 +55,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
 
   const [updateId, setUpdateId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [currentTab, setCurrentTab] = useState(1);
   const ITEMS_PER_PAGE = parseInt(process.env.REACT_APP_ITEMS_PER_PAGE, 10);
 
   // -------------------------------Funciones Para CRUD-------------------------------
@@ -59,10 +67,9 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
         setMessageWaiting(true);
         const config = {
           access_token,
-          specializationHasUserID,
+          typeEvaluateID: 1,
         };
         const response = await GETRequest(url, config);
-        console.log(response)
         OptionMessage(response);
       } else {
         setMessageError('No tienes una session');
@@ -79,7 +86,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       const access_token = Cookies.get('access_token');
       if (access_token) {
         setMessageWaiting(true);
-        const config = { ...newItem, specializationHasUserID, access_token };
+        const config = { ...newItem, access_token, typeEvaluateID: 1, };
         const response = await POSTRequest(url, config);
         OptionMessage(response);
       } else {
@@ -102,8 +109,8 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
         const config = {
           specializationHasSemesterID: updateId,
           ...newItem,
-          specializationHasUserID,
           access_token,
+          typeEvaluateID: 1,
         };
         const response = await PUTRequest(url, config);
         OptionMessage(response);
@@ -113,38 +120,6 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
     } catch (error) {
       setMessageWaiting(false);
       setMessageError(`Error updating ${itemName}:` + error.message);
-    }
-  };
-
-  const handleDeleteSelected = async () => {
-    try {
-      const url = urls[0];
-      const access_token = Cookies.get('access_token');
-      if (access_token) {
-        setMessageWaiting(true);
-        if (selectedItems.length !== 0) {
-          const idsToDelete = selectedItems.map(item => item.specializationHasSemesterID);
-
-          const chunkSize = process.env.REACT_APP_MAX_LENGHT_ARRAY_NUMBER;
-          for (let i = 0; i < idsToDelete.length; i += chunkSize) {
-            const chunk = idsToDelete.slice(i, i + chunkSize);
-
-            const config = {
-              access_token,
-              specializationHasUserIDs: chunk,
-              semesterID: newItem.semesterID,
-            };
-            console.log(config)
-            const response = await DELETERequest(url, config);
-            OptionMessage(response);
-          }
-        }
-      } else {
-        setMessageError('No tienes una sesión');
-      }
-    } catch (error) {
-      setMessageWaiting(false);
-      setMessageError(`Error deleting ${itemName}:` + error.message);
     }
   };
 
@@ -160,42 +135,47 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   const handleEdit = (item) => {
     setUpdateId(item.specializationHasSemesterID);
     setNewItem({
-      ...newItem,
-      typeEvaluateID: item.typeEvaluateID,
+      academic1_userID: item.guideAcademic_userID,
+      academic2_userID: item.academicA_userID,
+      academic3_userID: item.academicB_userID,
+      evaluateHasUser1ID: item.guideAcademic_evaluateHasUserID,
+      evaluateHasUser2ID: item.academicA_evaluateHasUserID,
+      evaluateHasUser3ID: item.academicB_evaluateHasUserID,
     });
+    openModal();
+  };
+
+  const handleCreation = (item) => {
+    setNewItem({
+      ...newItem,
+      specializationHasSemesterID: item.specializationHasSemesterID,
+    });
+    openModal();
   };
 
   const clearItem = () => {
     setUpdateId(null);
     setNewItem({
-      ...newItem,
-      typeEvaluateID: '',
+      academic1_userID: '',
+      academic2_userID: '',
+      academic3_userID: '',
+      evaluationStatusID: 2,
     });
-  };
-
-  const clearCheckbox = () => {
-    setSelectedItems([]);
-  };
-
-  const handleCheckboxChange = (event, item) => {
-    if (event.target.checked) {
-      setSelectedItems([item]);
-    } else {
-      setSelectedItems([]);
-    }
   };
 
   const OptionMessage = async (data) => {
     setMessageWaiting(false);
     if (data.verificationMessage) {
       setMessageVerification(data.verificationMessage);
+      fetchItemsSelect('academics', urls[1]);
+      fetchItemsSelect('semester', urls[2]);
       fetchItems();
       closeModal();
     }
     else if (data.renewalMessage) {
       setMessageVerification(data.renewalMessage);
       await fetchItems();
-      fetchItemsSelect('typeEvaluate', urls[1]);
+      fetchItemsSelect('academics', urls[1]);
       fetchItemsSelect('semester', urls[2]);
     }
     else if (data.errorDenied) {
@@ -204,8 +184,6 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
     }
     else if (data.expirationError) {
       const renewedData = await renewSession();
-      await fetchItemsSelect('typeEvaluate', urls[1]);
-      await fetchItemsSelect('semester', urls[2]);
       OptionMessage(renewedData);
     }
     else if (data.message) {
@@ -236,15 +214,14 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
     }
     else if (data) {
       setItems(data);
-      clearCheckbox();
     }
     else {
       setMessageError('Error Inesperado');
     }
   };
-  // -------------------------------Funciones para los Selectores Especiales-------------------------------
-  const [typeEvaluate, setTypeEvaluate] = useState([]);
+
   const [semester, setSemester] = useState([]);
+  const [academics, setAcademics] = useState([]);
 
   const fetchItemsSelect = async (nameSelect, url) => {
     try {
@@ -307,21 +284,17 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       }
     }
     else if (data) {
-      if (nameSelect === 'typeEvaluate') {
-        const sortedItems = sortItems(data, 'typeEvaluateID', 'asc');
+      if (nameSelect === 'academics') {
+        const sortedItems = sortItems(data, 'specializationHasSemesterID', 'asc');
         const format = sortedItems.map(item => ({
-          value: item.typeEvaluateID,
-          label: item.name
+          value: item.userID,
+          label: `${item.rut} - ${item.firstName} ${item.secondName} ${item.surnameM} ${item.surnameF}`,
         }));
-        setTypeEvaluate(format);
+        setAcademics(format);
       }
       else if (nameSelect === 'semester') {
         const sortedItems = sortItems(data, 'finishDate', 'desc');
-        setNewItem({
-          ...newItem,
-          semesterID: sortedItems[0].semesterID,
-        });
-        setSemester(sortedItems[0]);
+        setSemester(sortedItems);
       }
     }
     else {
@@ -332,21 +305,31 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   // -------------------------------Funciones para la Paginacion-------------------------------
   const [searchType, setSearchType] = useState('specializationHasSemesterID');
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchType2] = useState('semesterID');
+  const [searchTerm2, setSearchTerm2] = useState('');
 
-  const [sortDirection] = useState('desc');
-  const [sortProperty] = useState('finishDate');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [sortProperty, setSortProperty] = useState('finishDate');
 
   const getCurrentPageItems = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
 
-    const filteredItems = filterItems(items, searchTerm, searchType);
+    const searchParamsArray = [
+      { searchType, searchTerm },
+      { searchType: searchType2, searchTerm: searchTerm2 }
+    ];
+    const filteredItems = filterMultipleItems(items, searchParamsArray);
     const sortedItems = sortItems(filteredItems, sortProperty, sortDirection);
     return sortedItems.slice(startIndex, endIndex);
   };
 
   const getNumberFiltered = () => {
-    const filteredItems = filterItems(items, searchTerm, searchType);
+    const searchParamsArray = [
+      { searchType, searchTerm },
+      { searchType: searchType2, searchTerm: searchTerm2 }
+    ];
+    const filteredItems = filterMultipleItems(items, searchParamsArray);
     return filteredItems.length;
   }
 
@@ -357,7 +340,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       isMounted.current = true;
       // Coloca el código que deseas ejecutar solo una vez aquí
       fetchItems();
-      fetchItemsSelect('typeEvaluate', urls[1]);
+      fetchItemsSelect('academics', urls[1]);
       fetchItemsSelect('semester', urls[2]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -371,11 +354,84 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
     setMessageError(null);
     setMessageVerification(null);
   }
-
   // -------------------------------Funciones para los Modal-------------------------------
+  const [ModalOpen, setModalOpen] = useState(false);
+
+  const openModal = () => {
+    setModalOpen(true);
+  };
   const closeModal = () => {
+    setModalOpen(false);
     clearItem();
   };
+
+  // -------------------------------Contenido de los items-------------------------------
+
+  const theadContent = (
+    <tr>
+      <th className='whitespace-nowrap px-4 py-2 text-center font-medium text-gray-900'>
+        Asignar de Académicos
+      </th>
+      {options.map((option) => (
+        <th key={option.value} className='whitespace-nowrap px-4 py-2 font-medium text-gray-900'>
+          <div className='flex items-center justify-center text-center gap-1'>
+            {option.label}
+            <SortButton value={option.value} sortProperty={sortProperty} setSortProperty={setSortProperty} setSortDirection={setSortDirection} isActive={sortProperty === option.value} isAscending={sortDirection === 'asc'} />
+          </div>
+        </th>
+      ))}
+    </tr>
+  );
+
+  const tbodyContent = (
+    <>
+      {items.length === 0 && messageWaiting && (
+        <tr>
+          <td colSpan={options.length} className="w-1/2 h-96 translate-x-1/4">
+            <IconOnlyAlert />
+          </td>
+        </tr>
+      )}
+      {getCurrentPageItems().map((item) => (
+        <tr key={item.specializationHasSemesterID} className='text-center'>
+          <td className='px-4 py-2'>
+            <div className='w-full flex-1 sm:w-60'>
+              {item.guideAcademic_fullName
+                ? <CustomButton onClick={() => handleEdit(item)} type='button' color='orange' padding_x='4' padding_smx='6' padding_mdx='8' padding_y='2' width='full' height='10'>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                  Actualizar Académicos
+                </CustomButton>
+                : <CustomButton onClick={() => handleCreation(item)} type='button' color='orange' padding_x='4' padding_smx='6' padding_mdx='8' padding_y='2' width='full' height='10'>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                  Asignar Académicos
+                </CustomButton>}
+            </div>
+          </td>
+          <td className='px-4 py-2'>{item.specializationHasSemesterID}</td>
+          <td className='whitespace-nowrap px-4 py-2'>{item.rut}</td>
+          <td className='whitespace-nowrap px-4 py-2'>{item.fullName}</td>
+          <td className='whitespace-nowrap px-4 py-2'>{item.email}</td>
+          <td className='whitespace-nowrap px-4 py-2'>{item.name}</td>
+          <td className='px-4 py-2'>{item.typeEvaluateName}</td>
+          <td className='px-4 py-2'>{item.evaluationStatusName}</td>
+          <td className='px-4 py-2'>{item.statusName}</td>
+          <td className='px-4 py-2'>{item.guideAcademic_rut}</td>
+          <td className='px-4 py-2'>{item.academicA_rut}</td>
+          <td className='px-4 py-2'>{item.academicB_rut}</td>
+          <td className='px-4 py-2'>{item.guideAcademic_fullName}</td>
+          <td className='px-4 py-2'>{item.academicA_fullName}</td>
+          <td className='px-4 py-2'>{item.academicB_fullName}</td>
+          <td className='px-4 py-2'>{item.guideAcademic_email}</td>
+          <td className='px-4 py-2'>{item.academicA_email}</td>
+          <td className='px-4 py-2'>{item.academicB_email}</td>
+        </tr>
+      ))}
+    </>
+  );
 
   return (
     <div>
@@ -383,25 +439,51 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       {messageError && <Alert message={messageError} onClose={closeAlert} />}
       {messageVerification && (<AlertVerification message={messageVerification} onClose={closeAlert} />)}
 
+      <ModalCRUD isOpen={ModalOpen}>
+        <FormContainer
+          createMessage={`Asignar Académicos`}
+          create2Message={`Asignación de Académicos`}
+          updateMessage={`Actualizar Académicos`}
+          update2Message={`Actualización de Académicos`}
+          updateId={updateId}
+          itemName={itemName}
+          pText={''}
+          handleSubmit={handleSubmit}
+          closeModal={closeModal}
+        >
+          <SearchSelect
+            selectId='academic1_userID'
+            placeholder="Seleccionar el Primer Académico"
+            options={academics}
+            value={newItem.academic1_userID}
+            onChange={(selectedOption) => setNewItem({ ...newItem, academic1_userID: selectedOption.value })}
+          />
+          <SearchSelect
+            selectId='academic2_userID'
+            placeholder="Seleccionar el Segundo Académico"
+            options={academics}
+            value={newItem.academic2_userID}
+            onChange={(selectedOption) => setNewItem({ ...newItem, academic2_userID: selectedOption.value })}
+          />
+          <SearchSelect
+            selectId='academic3_userID'
+            placeholder="Seleccionar el Tercer Académico"
+            options={academics}
+            value={newItem.academic3_userID}
+            onChange={(selectedOption) => setNewItem({ ...newItem, academic3_userID: selectedOption.value })}
+          />
+        </FormContainer>
+      </ModalCRUD>
+
       <div className='min-h-screen'>
         <PageHeader title={title} subtitle={subtitle} />
-
         <SearchWithSelect selectId={`${searchType}`} searchTerm={searchTerm} setSearchTerm={setSearchTerm} searchType={searchType} setSearchType={setSearchType} options={options} />
-
         <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
-
-        <SpecializationHasSemesterSection updateId={updateId} itemName={itemName} semester={semester} items={getCurrentPageItems()} selectedItems={selectedItems} handleDeleteSelected={handleDeleteSelected} handleCheckboxChange={handleCheckboxChange} handleEdit={handleEdit} handleSubmit={handleSubmit} closeModal={closeModal}>
-          <SearchSelect
-            selectId='typeEvaluateID'
-            placeholder="Seleccione Tipo de Evaluación"
-            options={typeEvaluate}
-            value={newItem.typeEvaluateID}
-            onChange={(selectedOption) => setNewItem({ ...newItem, typeEvaluateID: selectedOption.value })}
-          />
-        </SpecializationHasSemesterSection>
+        <TabNavigation setSearchTerm={setSearchTerm2} currentTab={currentTab} setCurrentTab={setCurrentTab} items={semester} itemsPerPage={1} />
+        <Table theadContent={theadContent} tbodyContent={tbodyContent} />
       </div>
     </div >
   );
 };
 
-export default SpecializationHasSemesterCRUD;
+export default PreliminaryProjectCRUD;

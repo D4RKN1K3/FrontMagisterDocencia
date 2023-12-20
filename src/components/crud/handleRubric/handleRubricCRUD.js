@@ -13,12 +13,22 @@ import IconOnlyAlert from '../../alert/iconOnlyAlert'
 import { GETRequest, POSTRequest, PUTRequest, DELETERequest } from '../../../utils/requestHelpers';
 import { sortItems } from '../../../utils/crudHelpers/searchFilter';
 import { renewSession, deniedSession } from '../../../utils/sessionHelpers';
-import ItemListHeaderStage from '../../forms/header/itemListHeaderStage';
+import CustomButton from '../../button/customButton';
 import FormContainer from '../../forms/body/formContainer';
+import FormContainerNotUpdate from '../../forms/body/formContainerNotUpdate'
 import TextInput from '../../input/textInput';
 import TextArea from '../../input/textArea';
+import SearchSelect from '../../input/searchSelect';
 import TableRubric from '../../table/tableRubric';
 import ExportPDF from './exportPDF/exportPDF';
+
+const CustomPath = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+    </svg>
+  );
+};
 
 const areObjectsEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2);
 
@@ -45,22 +55,23 @@ const compareQuestions = (currentQuestions, initialQuestions) => {
   };
 };
 
-const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
+const HandleRubricCRUD = ({ showRubric, evaluateID, specializationHasSemesterID, specializationHasStudent, name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
-  const specializationHasUserID = 2;
-  const evaluateID = 17;
 
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState({
-    rubricName: '',
+    rubricName: 0,
     description: '',
+    comment: '',
+    statusID: '',
   });
 
   const [rubricHasQuestion, setRubricHasQuestion] = useState([]);
   const [defaultRubricHasQuestion, setDefaultRubricHasQuestion] = useState([]);
   const [question, setQuestion] = useState([]);
   const [defaultQuestion, setDefaultQuestion] = useState([]);
+  const [status, setStatus] = useState([]);
 
   const [updateId, setUpdateId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,7 +87,7 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
         setMessageWaiting(true);
         const config = {
           access_token,
-          specializationHasUserID,
+          specializationHasSemesterID,
           evaluateID,
         };
 
@@ -97,7 +108,7 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
       const access_token = Cookies.get('access_token');
       if (access_token) {
         setMessageWaiting(true);
-        const config = { ...newItem, access_token };
+        const config = { ...newItem, access_token, evaluateID, specializationHasSemesterID };
         const response = await POSTRequest(url, config);
         OptionMessage(response);
       } else {
@@ -118,9 +129,36 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
       if (access_token) {
         setMessageWaiting(true);
         const config = {
-          specializationHasUserID: updateId,
+          rubricID: updateId,
           ...newItem,
           access_token,
+          specializationHasSemesterID
+        };
+        const response = await PUTRequest(url, config);
+        OptionMessage(response);
+      } else {
+        setMessageError('No tienes una session');
+      }
+    } catch (error) {
+      setMessageWaiting(false);
+      setMessageError(`Error updating ${itemName}:` + error.message);
+    }
+  };
+
+  const handleUpdateStatus = async (event) => {
+    event.preventDefault();
+    if (updateId === null) return;
+
+    try {
+      const url = urls[1];
+      const access_token = Cookies.get('access_token');
+      if (access_token) {
+        setMessageWaiting(true);
+        const config = {
+          rubricID: updateId,
+          ...newItem,
+          access_token,
+          specializationHasSemesterID
         };
         const response = await PUTRequest(url, config);
         OptionMessage(response);
@@ -143,19 +181,34 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   const handleEdit = (item) => {
-    setUpdateId(item.evaluateID);
+    setUpdateId(item.rubricID);
     setNewItem({
       rubricName: item.rubricName,
       description: item.description,
+      comment: item.comment,
+      statusID: item.statusID,
     })
     openModal();
+  };
+
+  const handleEditStatus = (item) => {
+    setUpdateId(item.rubricID);
+    setNewItem({
+      rubricName: item.rubricName,
+      description: item.description,
+      comment: item.comment,
+      statusID: item.statusID,
+    })
+    openModalStatus();
   };
 
   const clearItem = () => {
     setUpdateId(null);
     setNewItem({
-      rubricName: '',
+      rubricName: 0,
       description: '',
+      comment: '',
+      statusID: '',
     })
   };
 
@@ -163,16 +216,18 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
     setMessageWaiting(false);
     if (data.verificationMessage) {
       setMessageVerification(data.verificationMessage);
-      await fetchItemsSelect('rubricHasQuestion', urls[1]);
+      await fetchItemsSelect('rubricHasQuestion', urls[2]);
       fetchItems();
       closeModal();
+      closeModalStatus();
     }
     else if (data.renewalMessage) {
       setMessageVerification(data.renewalMessage);
-      await fetchItemsSelect('rubricHasQuestion', urls[1]);
-      await fetchItemsSelect('defaultQuestion', urls[4]);
-      fetchItems();
-      fetchItemsSelect('question', urls[3]);
+      await fetchItemsSelect('status', urls[1]);
+      await fetchItems();
+      await fetchItemsSelect('rubricHasQuestion', urls[2]);
+      await fetchItemsSelect('defaultQuestion', urls[5]);
+      fetchItemsSelect('question', urls[4]);
     }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
@@ -223,7 +278,7 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
         setMessageWaiting(true);
         const config = {
           access_token,
-          specializationHasUserID,
+          specializationHasSemesterID,
           evaluateID,
         };
 
@@ -239,7 +294,6 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   const OptionMessageSelect = async (nameSelect, data) => {
-
     setMessageWaiting(false);
     if (data.verificationMessage) {
       setMessageVerification(data.verificationMessage);
@@ -286,7 +340,7 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
         setRubricHasQuestion(sortedItems);
       }
       else if (nameSelect === 'question') {
-        const sortedItems = sortItems(data, 'questionID', 'desc');
+        const sortedItems = sortItems(data, 'questionID', 'asc');
         const format = sortedItems.map(item => ({
           value: item.questionID,
           label: item.question,
@@ -294,8 +348,16 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
         setQuestion(format);
       }
       else if (nameSelect === 'defaultQuestion') {
-        const sortedItems = sortItems(data, 'questionID', 'desc');
+        const sortedItems = sortItems(data, 'questionID', 'asc');
         setDefaultQuestion(sortedItems);
+      }
+      else if (nameSelect === 'status') {
+        const sortedItems = sortItems(data, 'statusID', 'asc');
+        const format = sortedItems.map(item => ({
+          value: item.statusID,
+          label: item.name
+        }));
+        setStatus(format);
       }
     }
     else {
@@ -305,7 +367,7 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
 
   const handleCreateRubricHasQuestion = async (createdValues) => {
     try {
-      const url = urls[2];
+      const url = urls[3];
       const access_token = Cookies.get('access_token');
       if (access_token) {
         setMessageWaiting(true);
@@ -330,7 +392,7 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
 
   const handleUpdateRubricHasQuestion = async (modifiedValues) => {
     try {
-      const url = urls[2];
+      const url = urls[3];
       const access_token = Cookies.get('access_token');
       if (access_token) {
         setMessageWaiting(true);
@@ -355,7 +417,7 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
 
   const handleDeleteSelected = async (deletedValues, rubricID) => {
     try {
-      const url = urls[2];
+      const url = urls[3];
       const access_token = Cookies.get('access_token');
       if (access_token) {
         setMessageWaiting(true);
@@ -443,21 +505,22 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await fetchItemsSelect('rubricHasQuestion', urls[1]);
-        await fetchItemsSelect('defaultQuestion', urls[4]);
-        fetchItems();
-        fetchItemsSelect('question', urls[3]);
+        await fetchItemsSelect('status', urls[1]);
+        await fetchItems();
+        await fetchItemsSelect('rubricHasQuestion', urls[2]);
+        await fetchItemsSelect('defaultQuestion', urls[5]);
+        fetchItemsSelect('question', urls[4]);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
-    if (!isMounted.current) {
+    if (!isMounted.current && showRubric) {
       isMounted.current = true;
       fetchData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
+  }, [showRubric]);
 
   const [messageError, setMessageError] = useState(null);
   const [messageVerification, setMessageVerification] = useState(null);
@@ -496,6 +559,16 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
     setModalOpenFile(false);
   };
 
+  const [ModalOpenStatus, setModalOpenStatus] = useState(false);
+
+  const openModalStatus = () => {
+    setModalOpenStatus(true);
+  };
+  const closeModalStatus = () => {
+    setModalOpenStatus(false);
+    clearItem();
+  };
+
   return (
     <div>
       {messageWaiting && <WaitingAlert />}
@@ -522,7 +595,33 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
             onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
             placeholder={`Ingresar Descripcion`}
           />
+          <TextArea
+            inputId='comment'
+            value={newItem.comment}
+            onChange={(e) => setNewItem({ ...newItem, comment: e.target.value })}
+            placeholder={`Ingresar Comentario`}
+          />
         </FormContainer>
+      </ModalCRUD>
+
+      <ModalCRUD isOpen={ModalOpenStatus}>
+        <FormContainerNotUpdate
+          message={'Actualizar Estado'}
+          secondaryMessage={'Actualización del Estado de la Evaluación'}
+          pText={''}
+          messageButton={'Actualizar Estado'}
+          handleSubmit={handleUpdateStatus}
+          closeModal={closeModalStatus}
+          customPath={<CustomPath />}
+        >
+          <SearchSelect
+            selectId='statusID'
+            placeholder="Seleccione Estado de la Rubrica"
+            options={status}
+            value={newItem.statusID}
+            onChange={(selectedOption) => setNewItem({ ...newItem, statusID: selectedOption.value })}
+          />
+        </FormContainerNotUpdate>
       </ModalCRUD>
 
       <ModalFile isOpen={ModalOpenFile} onClose={closeModalFile}>
@@ -533,14 +632,41 @@ const HandleRubricCRUD = ({ name, urls, title, subtitle }) => {
         </div>
       </ModalFile>
 
-      <div className='min-h-screen mx-2 my-2'>
-        <ItemListHeaderStage
-          title={title}
-          subtitle={subtitle}
-          message={'Crear Rubrica'}
-          openModal={openModal}
-        />
-        <TableRubric items={getCurrentPageItems()} defaultRubricHasQuestion={defaultRubricHasQuestion} rubricHasQuestion={rubricHasQuestion} setRubricHasQuestion={setRubricHasQuestion} question={question} defaultQuestion={defaultQuestion} handleEdit={handleEdit} handleSaveChanges={handleSaveChanges} handleExportPDF={handleExportPDF} />
+      <div className='min-h-screen my-2'>
+        {(items.length === 0 && !messageWaiting) &&
+          <div className='w-full'>
+            <CustomButton
+              onClick={openModal}
+              type="button"
+              color="orange"
+              padding_x="4"
+              padding_smx="0"
+              padding_mdx="0"
+              padding_y="2"
+              width="full"
+              height="10"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Crear Rubrica
+            </CustomButton>
+          </div>
+        }
+        {(items.length > 0) &&
+          <TableRubric items={getCurrentPageItems()} defaultRubricHasQuestion={defaultRubricHasQuestion} rubricHasQuestion={rubricHasQuestion} setRubricHasQuestion={setRubricHasQuestion} question={question} defaultQuestion={defaultQuestion} handleEditStatus={handleEditStatus} handleEdit={handleEdit} handleSaveChanges={handleSaveChanges} handleExportPDF={handleExportPDF} />
+        }
       </div>
     </div >
   );

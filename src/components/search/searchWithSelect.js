@@ -9,8 +9,23 @@ const SearchWithSelect = ({
     options,
 }) => {
     return (
-        <div className='grid grid-cols-5 items-center gap-1'>
-            <div className='col-span-full sm:col-span-4 w-full sm:w-auto'>
+        <div className='grid grid-cols-8 items-center gap-1'>
+            <div className='col-span-full sm:col-span-2 w-full sm:w-auto'>
+                <select
+                    id="searchSelect"
+                    name="searchSelect"
+                    className="h-9 sm:h-10 w-full rounded-lg border-gray-300 text-gray-700 text-xs sm:text-sm text-start"
+                    value={searchType}
+                    onChange={(e) => setSearchType(e.target.value)}
+                >
+                    {options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div className='col-span-full sm:col-span-6 w-full sm:w-auto'>
                 <div className="relative z-1">
                     <label htmlFor={selectId} className="sr-only">
                         {selectId}
@@ -40,22 +55,6 @@ const SearchWithSelect = ({
                         />
                     </svg>
                 </div>
-            </div>
-
-            <div className='col-span-full sm:col-span-1 w-full sm:w-auto'>
-                <select
-                    id="searchSelect"
-                    name="searchSelect"
-                    className="h-9 sm:h-10 w-full rounded-lg border-gray-300 text-gray-700 text-xs sm:text-sm text-start"
-                    value={searchType}
-                    onChange={(e) => setSearchType(e.target.value)}
-                >
-                    {options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
             </div>
         </div>
     );

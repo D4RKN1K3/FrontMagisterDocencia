@@ -19,8 +19,9 @@ import CustomButton from '../../../button/customButton';
 import SortButton from '../../../sort/sortButton';
 import IconOnlyAlert from '../../../alert/iconOnlyAlert';
 import SearchSelect from '../../../input/searchSelect';
+import PageHeader from '../../../forms/header/pageHeader';
 
-const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
+const ThesisCRUD = ({ name, urls, title, subtitle }) => {
   const [itemName] = useState(name);
   const navigate = useNavigate();
 
@@ -28,7 +29,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   const [newItem, setNewItem] = useState({
     academic1_userID: '',
     academic2_userID: '',
-    academic3_userID: '',
+    academic3_userID: 0,
     evaluationStatusID: 2,
   });
 
@@ -40,15 +41,13 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
     { label: `Nombre de la Especialización`, value: 'name' },
     { label: `Tipo de Evaluacion`, value: 'typeEvaluateName' },
     { label: `Nombre del Estado de la Revisión`, value: 'evaluationStatusName' },
-    { label: `Rut del Académico Guia`, value: 'guideAcademic_rut' },
-    { label: `Rut del Académico A`, value: 'academicA_rut' },
-    { label: `Rut del Académico B`, value: 'academicB_rut' },
-    { label: `Nombre Completo del Académico Guia`, value: 'guideAcademic_fullName' },
-    { label: `Nombre Completo del Académico A`, value: 'academicA_fullName' },
-    { label: `Nombre Completo del Académico B`, value: 'academicB_fullName' },
-    { label: `Email del Académico Guia`, value: 'guideAcademic_email' },
-    { label: `Email del Académico A`, value: 'academicA_email' },
-    { label: `Email del Académico B`, value: 'academicB_email' },
+    { label: `Estado` , value: 'statusName'},
+    { label: `Rut del Director`, value: 'director_rut' },
+    { label: `Rut del Co-Director`, value: 'codirector_rut' },
+    { label: `Nombre Completo del Director`, value: 'director_fullName' },
+    { label: `Nombre Completo del Co-Director`, value: 'codirector_fullName' },
+    { label: `Email del Director`, value: 'director_email' },
+    { label: `Email del Co-Director`, value: 'codirector_email' },
   ];
 
   const [updateId, setUpdateId] = useState(null);
@@ -65,9 +64,9 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
         setMessageWaiting(true);
         const config = {
           access_token,
+          typeEvaluateID: 2,
         };
         const response = await GETRequest(url, config);
-        console.log(response)
         OptionMessage(response);
       } else {
         setMessageError('No tienes una session');
@@ -84,7 +83,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       const access_token = Cookies.get('access_token');
       if (access_token) {
         setMessageWaiting(true);
-        const config = { ...newItem, access_token };
+        const config = { ...newItem, access_token, typeEvaluateID: 2, };
         const response = await POSTRequest(url, config);
         OptionMessage(response);
       } else {
@@ -108,6 +107,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
           specializationHasSemesterID: updateId,
           ...newItem,
           access_token,
+          typeEvaluateID: 2,
         };
         const response = await PUTRequest(url, config);
         OptionMessage(response);
@@ -132,12 +132,12 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   const handleEdit = (item) => {
     setUpdateId(item.specializationHasSemesterID);
     setNewItem({
-      academic1_userID: item.guideAcademic_userID,
-      academic2_userID: item.academicA_userID,
-      academic3_userID: item.academicB_userID,
-      evaluateHasUser1ID: item.guideAcademic_evaluateHasUserID,
-      evaluateHasUser2ID: item.academicA_evaluateHasUserID,
-      evaluateHasUser3ID: item.academicB_evaluateHasUserID,
+      academic1_userID: item.director_userID,
+      academic2_userID: item.codirector_userID,
+      academic3_userID: 0,
+      evaluateHasUser1ID: item.director_evaluateHasUserID,
+      evaluateHasUser2ID: item.codirector_evaluateHasUserID,
+      evaluateHasUser3ID: 0,
     });
     openModal();
   };
@@ -155,7 +155,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
     setNewItem({
       academic1_userID: '',
       academic2_userID: '',
-      academic3_userID: '',
+      academic3_userID: 0,
       evaluationStatusID: 2,
     });
   };
@@ -164,16 +164,18 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
     setMessageWaiting(false);
     if (data.verificationMessage) {
       setMessageVerification(data.verificationMessage);
-      fetchItemsSelect('academics', urls[1]);
-      fetchItemsSelect('semester', urls[2]);
+      fetchItemsSelect('director', urls[1]);
+      fetchItemsSelect('mandated', urls[2]);
+      fetchItemsSelect('semester', urls[3]);
       fetchItems();
       closeModal();
     }
     else if (data.renewalMessage) {
       setMessageVerification(data.renewalMessage);
       await fetchItems();
-      fetchItemsSelect('academics', urls[1]);
-      fetchItemsSelect('semester', urls[2]);
+      fetchItemsSelect('director', urls[1]);
+      fetchItemsSelect('mandated', urls[2]);
+      fetchItemsSelect('semester', urls[3]);
     }
     else if (data.errorDenied) {
       setMessageError(data.errorDenied);
@@ -218,7 +220,8 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   };
 
   const [semester, setSemester] = useState([]);
-  const [academics, setAcademics] = useState([]);
+  const [director, setDirector] = useState([]);
+  const [mandated, setMandated] = useState([]);
 
   const fetchItemsSelect = async (nameSelect, url) => {
     try {
@@ -281,13 +284,20 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       }
     }
     else if (data) {
-      if (nameSelect === 'academics') {
-        const sortedItems = sortItems(data, 'specializationHasSemesterID', 'asc');
+      if (nameSelect === 'director') {
+        const sortedItems = sortItems(data, 'rut', 'asc');
         const format = sortedItems.map(item => ({
           value: item.userID,
           label: `${item.rut} - ${item.firstName} ${item.secondName} ${item.surnameM} ${item.surnameF}`,
         }));
-        setAcademics(format);
+        setDirector(format);
+      } else if (nameSelect === 'mandated') {
+        const sortedItems = sortItems(data, 'rut', 'asc');
+        const format = sortedItems.map(item => ({
+          value: item.userID,
+          label: `${item.rut} - ${item.firstName} ${item.secondName} ${item.surnameM} ${item.surnameF}`,
+        }));
+        setMandated(format);
       }
       else if (nameSelect === 'semester') {
         const sortedItems = sortItems(data, 'finishDate', 'desc');
@@ -337,8 +347,9 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
       isMounted.current = true;
       // Coloca el código que deseas ejecutar solo una vez aquí
       fetchItems();
-      fetchItemsSelect('academics', urls[1]);
-      fetchItemsSelect('semester', urls[2]);
+      fetchItemsSelect('director', urls[1]);
+      fetchItemsSelect('mandated', urls[2]);
+      fetchItemsSelect('semester', urls[3]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
@@ -367,7 +378,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   const theadContent = (
     <tr>
       <th className='whitespace-nowrap px-4 py-2 text-center font-medium text-gray-900'>
-      Asignar de Académicos
+        Asignar de Académicos
       </th>
       {options.map((option) => (
         <th key={option.value} className='whitespace-nowrap px-4 py-2 font-medium text-gray-900'>
@@ -393,7 +404,7 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
         <tr key={item.specializationHasSemesterID} className='text-center'>
           <td className='px-4 py-2'>
             <div className='w-full flex-1 sm:w-60'>
-              {item.guideAcademic_fullName
+              {item.director_fullName
                 ? <CustomButton onClick={() => handleEdit(item)} type='button' color='orange' padding_x='4' padding_smx='6' padding_mdx='8' padding_y='2' width='full' height='10'>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -415,15 +426,13 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
           <td className='whitespace-nowrap px-4 py-2'>{item.name}</td>
           <td className='px-4 py-2'>{item.typeEvaluateName}</td>
           <td className='px-4 py-2'>{item.evaluationStatusName}</td>
-          <td className='px-4 py-2'>{item.guideAcademic_rut}</td>
-          <td className='px-4 py-2'>{item.academicA_rut}</td>
-          <td className='px-4 py-2'>{item.academicB_rut}</td>
-          <td className='px-4 py-2'>{item.guideAcademic_fullName}</td>
-          <td className='px-4 py-2'>{item.academicA_fullName}</td>
-          <td className='px-4 py-2'>{item.academicB_fullName}</td>
-          <td className='px-4 py-2'>{item.guideAcademic_email}</td>
-          <td className='px-4 py-2'>{item.academicA_email}</td>
-          <td className='px-4 py-2'>{item.academicB_email}</td>
+          <td className='px-4 py-2'>{item.statusName}</td>
+          <td className='px-4 py-2'>{item.director_rut}</td>
+          <td className='px-4 py-2'>{item.codirector_rut}</td>
+          <td className='px-4 py-2'>{item.director_fullName}</td>
+          <td className='px-4 py-2'>{item.codirector_fullName}</td>
+          <td className='px-4 py-2'>{item.director_email}</td>
+          <td className='px-4 py-2'>{item.codirector_email}</td>
         </tr>
       ))}
     </>
@@ -449,37 +458,23 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
         >
           <SearchSelect
             selectId='academic1_userID'
-            placeholder="Seleccionar el Primer Académico"
-            options={academics}
+            placeholder="Seleccionar el Director"
+            options={director}
             value={newItem.academic1_userID}
             onChange={(selectedOption) => setNewItem({ ...newItem, academic1_userID: selectedOption.value })}
           />
           <SearchSelect
             selectId='academic2_userID'
-            placeholder="Seleccionar el Segundo Académico"
-            options={academics}
+            placeholder="Seleccionar un Co-Director"
+            options={mandated}
             value={newItem.academic2_userID}
             onChange={(selectedOption) => setNewItem({ ...newItem, academic2_userID: selectedOption.value })}
-          />
-          <SearchSelect
-            selectId='academic3_userID'
-            placeholder="Seleccionar el Tercer Académico"
-            options={academics}
-            value={newItem.academic3_userID}
-            onChange={(selectedOption) => setNewItem({ ...newItem, academic3_userID: selectedOption.value })}
           />
         </FormContainer>
       </ModalCRUD>
 
       <div className='min-h-screen'>
-        <div className="text-center mb-4">
-          <h1 className="text-3xl sm:text-4xl font-semibold text-gray-900">
-            {title}
-          </h1>
-          <p className="text-md sm:text-lg font-medium text-gray-500">
-            {subtitle}
-          </p>
-        </div>
+        <PageHeader title={title} subtitle={subtitle} />
         <SearchWithSelect selectId={`${searchType}`} searchTerm={searchTerm} setSearchTerm={setSearchTerm} searchType={searchType} setSearchType={setSearchType} options={options} />
         <PaginationButtons currentPage={currentPage} setCurrentPage={setCurrentPage} length={items.length} itemsPerPage={ITEMS_PER_PAGE} numberFiltered={getNumberFiltered()} />
         <TabNavigation setSearchTerm={setSearchTerm2} currentTab={currentTab} setCurrentTab={setCurrentTab} items={semester} itemsPerPage={1} />
@@ -489,4 +484,4 @@ const SpecializationHasSemesterCRUD = ({ name, urls, title, subtitle }) => {
   );
 };
 
-export default SpecializationHasSemesterCRUD;
+export default ThesisCRUD;
